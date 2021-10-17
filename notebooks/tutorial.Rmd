@@ -7,6 +7,72 @@ This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute
 
 Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
 
+
+```{r} 
+# ANOVA following tutorial at: http://web.pdx.edu/~joel8/resources/ConceptualPresentationResources/JAGS_ANOVA.pdf
+
+library(rjags)
+library(lattice)
+library(knitr)
+# library(kableExtra)
+# for nice display of inline code 
+opts_chunk$set(echo=TRUE, comment='') 
+# for nicely formatted tables 
+options(knitr.table.format = "latex")
+
+# generate data
+mdat = list('grp'=gl(3,4), 'ngrp'=3, 'N'=12, 'y'=c(2,1,3,2, 2,6,2,2, 6,10,7,5))
+# quick visualization of the data
+disp.mdat = matrix(mdat$y,ncol=mdat$ngrp,
+                   dimnames = list(paste('obs',1:(mdat$N/mdat$ngrp),sep=' '),
+                                   paste('group',1:mdat$ngrp,sep=' '))) 
+
+disp.mdat
+```
+
+#![Here is a Crab](images/bayes_thereom.png)
+
+```{r}
+# specify the likelihood model
+mt = ' model{
+  for(i in 1:N){
+  y[i] ~ dnorm(mu[i], err.prec) 
+  mu[i] = alpha + beta[grp[i]]
+  }
+  err.prec ~ dgamma(1.0E-3,1.0E-3) rse = pow(err.prec,-.5)
+  alpha ~ dnorm(0,1.0E-3)
+  
+  beta[1] = 0
+  for(i in 2:ngrp){
+  beta[i] ~ dnorm(0,1.0E-3) 
+  }
+}'
+# compile the model in JAGS
+ti = textConnection(mt)
+cm = jags.model(ti, data=mdat, # model specification and data.
+                n.chains=2, # two random walkers
+                # initial values, one set per chain 
+                inits=list(
+                list('alpha'=0,'beta'=c(NA,.5,.5)),
+                list('alpha'=2,'beta'=c(NA,1,5))),
+                # burn-in/adaptation steps before we trust
+                n.adapt = 1000, quiet=TRUE)
+close(ti) # clean up
+# run the chains longer 
+update(cm,5000)
+
+#### Monitoring the Postreriors
+# track the progress of our walkers relative to our parameters of interest 
+pos = coda.samples(cm, # our compiled model
+                   # parameters of interest to monitor
+                   variable.names=c('alpha','beta','rse'), 
+                   n.iter=5000) # steps to follow
+```
+
+```{r Visualization}
+xyplot(window(pos,start=5001,stop=10000))
+```
+
 ```{r}
 # following tuturial at: http://www.jkarreth.net/files/bayes-cph_Tutorial-JAGS.pdf
 library(R2jags)
