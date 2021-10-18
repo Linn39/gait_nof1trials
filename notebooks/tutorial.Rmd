@@ -71,9 +71,9 @@ load_gait_parameters <- function (folder_path, keyword, subject, test, cond) {
 dataset <- "fatigue_dual_task"
 cond_list <- list("dt", "st")
 test_list <- list("fatigue", "control")
-IMU_loc <- list('LF')
+IMU_loc <- list('LFRF_windowed')  # LFRF_windowed, LF, RF
 
-sub_list <- list(
+sub_list <- list(  # for n-of-1 trials, select only one subject!
   "sub_01"
   # "sub_02",
   # "sub_03",
@@ -96,18 +96,62 @@ sub_list <- list(
 #   
 # dat <- readr::read_csv(file_path, col_names = T)
 
-# read all data for one IMU location
-loc_df <- data.frame()
-for (cond in cond_list) {
-  for (test in test_list) {
-    for (sub in sub_list) {
-      for (kw in IMU_loc) {
-        dat_df_temp <- load_gait_parameters(folder_path, kw,  sub, test, cond)
-        loc_df <- rbind(loc_df, dat_df_temp)
+if (grepl("windowed", IMU_loc[1], fixed = TRUE)) {
+  # read windowed parameters from only one file
+  loc_df <- load_gait_parameters(folder_path, kw,  sub, test, cond)
+  print(nrow(loc_df))
+} else {
+  # read all data for one IMU location
+  loc_df <- data.frame()
+  for (cond in cond_list) {
+    for (test in test_list) {
+      for (sub in sub_list) {
+        for (kw in IMU_loc) {
+          dat_df_temp <- load_gait_parameters(folder_path, kw,  sub, test, cond)
+          print(nrow(dat_df_temp))
+          loc_df <- rbind(loc_df, dat_df_temp)
+          print(nrow(loc_df))
+        }
       }
     }
   }
 }
+
+
+# select list of features
+features_list <- c(
+  'stride_lengths_avg'
+  # 'clearances_min_avg', 
+  # 'clearances_max_avg',
+  # 'stride_times_avg', 
+  # 'swing_times_avg', 
+  # 'stance_times_avg',
+  # 'stance_ratios_avg', 
+  # 'cadence_avg', 
+  # 'speed_avg', 
+  # 'stride_lengths_CV',
+  # 'clearances_min_CV', 
+  # 'clearances_max_CV', 
+  # 'stride_times_CV',
+  # 'swing_times_CV', 
+  # 'stance_times_CV', 
+  # 'stance_ratios_CV', 
+  # 'cadence_CV',
+  # 'speed_CV', 
+  # 'stride_lengths_SI', 
+  # 'clearances_min_SI',
+  # 'clearances_max_SI', 
+  # 'stride_times_SI', 
+  # 'swing_times_SI',
+  # 'stance_times_SI', 
+  # 'stance_ratios_SI', 
+  # 'cadence_SI', 
+  # 'speed_SI'
+)
+
+# compose the datafram used for further analysis
+dat_df <- filter(loc_df, sub == sub_list[1])
+dat_df <- dat_df[, c(features_list, "fatigue", "condition")]
 ```
 
 #![Here is a Crab](images/bayes_thereom.png)
