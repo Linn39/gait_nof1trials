@@ -31,6 +31,83 @@ disp.mdat = matrix(mdat$y,ncol=mdat$ngrp,
 disp.mdat
 ```
 
+
+```{r load our gait data}
+
+load_gait_parameters <- function (folder_path, keyword, subject, test, cond) {
+  
+  #### first find file name by keyward ####
+  file_path <- c()
+  kw_fn_list <- list()  # keyword - file name pairs
+  kw_fn_list[[ "LF" ]] <- "left_foot_aggregate_params_py_n.csv"
+  kw_fn_list[[ "RF" ]] <- "right_foot_aggregate_params_py_n.csv"
+  kw_fn_list[[ "LFRF" ]] <- "aggregate_params_py_n.csv"
+  kw_fn_list[[ "LFRF_windowed" ]] <- "agg_windows_control_fatigue_st_dt_10_2.csv"
+
+  # look up file names
+  if (keyword %in% names(kw_fn_list)) {
+    file_name <- kw_fn_list[[keyword]]
+  }
+  else {
+    return(paste("Keyword", keyword, "does not exist!"))
+  }
+  
+  #### then load the data ####
+  if ("windowed" %in% keyword) {
+    folder_path <- file.path("../../fatigue_gait/data/processed", "features", "fatigue_dual_task")
+  }
+  else {
+    folder_path <- file.path("../fatigue_gait/data/processed_publish", dataset, paste0("OG_", cond, "_", test), sub)
+  }
+  
+  data_path <- file.path(folder_path, file_name)
+  dat_df <- readr::read_csv(data_path, col_names = T)
+}
+
+
+## load & concat .csv file
+dataset <- "fatigue_dual_task"
+cond_list <- list("dt", "st")
+test_list <- list("fatigue", "control")
+IMU_loc <- list('LFRF')
+
+sub_list <- list(
+  "sub_01",
+  "sub_02",
+  "sub_03",
+  "sub_05",
+  "sub_06",
+  "sub_07",
+  "sub_08",
+  "sub_09",
+  "sub_10",
+  "sub_11",
+  "sub_12",
+  "sub_13",
+  "sub_14",
+  "sub_15",
+  "sub_17",
+  "sub_18"
+  )
+
+# file_path <- file.path("../../fatigue_gait/data/processed", "features", "fatigue_dual_task", "agg_windows_control_fatigue_st_dt_10_2.csv")
+#   
+# dat <- readr::read_csv(file_path, col_names = T)
+
+# read all data for one IMU location
+loc_df <- data.frame()
+for (cond in cond_list) {
+  for (test in test_list) {
+    for (sub in sub_list) {
+      for (kw in IMU_loc) {
+        dat_df_temp <- load_gait_parameters(folder_path, kw,  sub, test, cond)
+        loc_df <- rbind(loc_df, dat_df_temp)
+      }
+    }
+  }
+}
+```
+
 #![Here is a Crab](images/bayes_thereom.png)
 #![Here is a Crab](images/bayes_thereom_linear_regression.png)
 
@@ -41,7 +118,8 @@ mt = ' model{
   y[i] ~ dnorm(mu[i], err.prec) 
   mu[i] = alpha + beta[grp[i]]
   }
-  err.prec ~ dgamma(1.0E-3,1.0E-3) rse = pow(err.prec,-.5)
+  err.prec ~ dgamma(1.0E-3,1.0E-3) 
+  rse = pow(err.prec,-.5)
   alpha ~ dnorm(0,1.0E-3)
   
   beta[1] = 0
