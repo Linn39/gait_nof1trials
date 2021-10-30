@@ -1,0 +1,231 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+#### Following tutorial at: https://agabrioblog.onrender.com/tutorial/factorial-anova-jags/factorial-anova-jags/
+
+```{r} 
+# rm(list = ls())
+
+library(ggplot2)
+library(R2jags)
+library(lattice)
+library(knitr)
+library(dplyr) 
+library(tidyr)
+# library(kableExtra)
+# for nice display of inline code 
+opts_chunk$set(echo=TRUE, comment='') 
+# for nicely formatted tables 
+options(knitr.table.format = "latex")
+
+```
+
+```{r load our gait data}
+
+load_gait_parameters <- function (folder_path, keyword, subject, test, cond) {
+  
+  #### first find file name by keyward ####
+  file_path <- c()
+  kw_fn_list <- list()  # keyword - file name pairs
+  kw_fn_list[[ "LF" ]] <- "left_foot_core_params_py_n.csv"
+  kw_fn_list[[ "RF" ]] <- "right_foot_core_params_py_n.csv"
+  kw_fn_list[[ "LFRF_windowed" ]] <- "agg_windows_control_fatigue_st_dt_10_2.csv"
+
+  # look up file names
+  if (keyword %in% names(kw_fn_list)) {
+    file_name <- kw_fn_list[[keyword]]
+  }
+  else {
+    return(paste("Keyword", keyword, "does not exist!"))
+  }
+  
+  #### then load the data ####
+  if (grepl("windowed", keyword, fixed = TRUE)) {
+    folder_path <- file.path("../../fatigue_gait/data_publish/processed", "features")
+    data_path <- file.path(folder_path, file_name)
+    dat_df <- readr::read_csv(data_path, col_names = T, show_col_types = FALSE)
+    # dat_df <- dat_df[(dat_df$)]
+  }
+  else {
+    folder_path <- file.path("../../fatigue_gait/data_publish/processed", paste0("OG_", cond, "_", test), sub)
+    data_path <- file.path(folder_path, file_name)
+    dat_df <- readr::read_csv(data_path, col_names = T, show_col_types = FALSE)
+    # remove outlier strides
+    loc_df <- loc_df[(dat_df$is_outlier == FALSE) & 
+                     (dat_df$turning_interval == FALSE) & 
+                     (dat_df$interrupted == FALSE),
+                     ]
+  }
+  
+  data_path <- file.path(folder_path, file_name)
+  dat_df <- readr::read_csv(data_path, col_names = T, show_col_types = FALSE)
+  
+  return(dat_df)
+}
+
+
+## load & concat .csv file
+# dataset <- "fatigue_dual_task"
+cond_list <- list("dt", "st")
+test_list <- list("fatigue", "control")
+IMU_loc <- list('LFRF_windowed')  # LFRF_windowed, LF, RF
+kw <- IMU_loc[[1]]  # safety measure, for now we only load one location at a time
+
+sub_list <- list(  # for n-of-1 trials, select only one subject!
+  # "sub_01"
+  # "sub_02",
+  # "sub_03",
+  # "sub_05",
+  # "sub_06",
+  # "sub_07",
+  "sub_08"
+  # "sub_09",
+  # "sub_10",
+  # "sub_11",
+  # "sub_12",
+  # "sub_13",
+  # "sub_14",
+  # "sub_15",
+  # "sub_17",
+  # "sub_18"
+  )
+
+# file_path <- file.path("../../fatigue_gait/data/processed", "features", "fatigue_dual_task", "agg_windows_control_fatigue_st_dt_10_2.csv")
+#   
+# dat <- readr::read_csv(file_path, col_names = T)
+
+if (grepl("windowed", kw, fixed = TRUE)) {
+  # read windowed parameters from only one file
+  loc_df <- load_gait_parameters(folder_path, kw,  sub, test, cond)
+  print(nrow(loc_df))
+} else {
+  # read all data for one IMU location
+  loc_df <- data.frame()
+  for (cond in cond_list) {
+    for (test in test_list) {
+      for (sub in sub_list) {
+        for (kw in IMU_loc) {
+          dat_df_temp <- load_gait_parameters(folder_path, kw, sub, test, cond)
+          dat_df_temp["fatigue"] <- test
+          dat_df_temp["condition"] <- cond
+          loc_df <- bind_rows(loc_df, dat_df_temp)
+        }
+      }
+    }
+  }
+}
+
+
+# select list of features
+features_list <- c(
+  'stride_lengths_avg'
+  # 'clearances_min_avg', 
+  # 'clearances_max_avg',
+  # 'stride_times_avg', 
+  # 'swing_times_avg', 
+  # 'stance_times_avg',
+  # 'stance_ratios_avg', 
+  # 'cadence_avg', 
+  # 'speed_avg', 
+  # 'stride_lengths_CV',
+  # 'clearances_min_CV', 
+  # 'clearances_max_CV', 
+  # 'stride_times_CV',
+  # 'swing_times_CV', 
+  # 'stance_times_CV', 
+  # 'stance_ratios_CV', 
+  # 'cadence_CV',
+  # 'speed_CV', 
+  # 'stride_lengths_SI', 
+  # 'clearances_min_SI',
+  # 'clearances_max_SI', 
+  # 'stride_times_SI', 
+  # 'swing_times_SI',
+  # 'stance_times_SI', 
+  # 'stance_ratios_SI', 
+  # 'cadence_SI', 
+  # 'speed_SI'
+)
+
+# compose the datafram used for further analysis
+dat_df <- filter(loc_df, sub == sub_list[1])
+dat_df <- dat_df[, c(features_list, "fatigue", "condition")]
+dat_df <- rename(dat_df,c('y' = features_list[1]))
+
+```
+
+```{r}
+with(dat_df, interaction.plot(fatigue, condition, y))
+```
+```{r}
+ ggplot(dat_df, aes(y = y, x = condition, fill = fatigue)) + geom_boxplot()
+```
+
+```{r}
+modelString = "
+  model {
+  #Likelihood
+  for (i in 1:n) {
+  y[i]~dnorm(mean[i],tau)
+  mean[i] <- inprod(beta[],X[i,])
+  }
+  #Priors
+  for (i in 1:ngroups) {
+  beta[i] ~ dnorm(0, 1.0E-6) 
+  }
+  sigma ~ dunif(0, 100)
+  tau <- 1 / (sigma * sigma)
+  }
+"
+
+## write the model to a text file
+writeLines(modelString, con = "fact_anovaModel.txt")
+```
+
+```{r}
+# Arrange the data as a list (as required by JAGS)
+X <- model.matrix(~condition * fatigue, dat_df)
+data.list <- with(dat_df, list(y = y, X = X, n = nrow(dat_df), ngroups = ncol(X)))
+```
+
+```{r}
+params <- c("beta", "sigma")
+nChains = 2
+burnInSteps = 3000
+thinSteps = 1
+numSavedSteps = 15000  #across all chains
+nIter = ceiling(burnInSteps + (numSavedSteps * thinSteps)/nChains)
+```
+
+```{r}
+data.r2jags <- jags(data = data.list, inits = NULL, parameters.to.save = params,
+                    model.file = "fact_anovaModel.txt", n.chains = nChains, n.iter = nIter,
+                    n.burnin = burnInSteps, n.thin = thinSteps)
+```
+```{r}
+print(data.r2jags)
+```
+## MCMC diagnostics
+
+```{r}
+library(mcmcplots)
+denplot(data.r2jags, parms = c("beta"))
+```
+
+```{r}
+traplot(data.r2jags, parms = c("beta"))
+```
+
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
