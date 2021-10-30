@@ -15,6 +15,7 @@ library(rjags)
 library(lattice)
 library(knitr)
 library(dplyr) 
+library(tidyr)
 # library(kableExtra)
 # for nice display of inline code 
 opts_chunk$set(echo=TRUE, comment='') 
@@ -161,7 +162,29 @@ features_list <- c(
 
 # compose the datafram used for further analysis
 dat_df <- filter(loc_df, sub == sub_list[1])
-# dat_df <- dat_df[, c(features_list, "fatigue", "condition")]
+dat_df <- dat_df[, c(features_list, "fatigue", "condition", "sub")]
+
+```
+
+```{r}
+# re-format the dataframe to match likelihood model input format
+dat_df$group <- paste0(dat_df$condition, "_", dat_df$fatigue)
+dat_df <- dat_df[, c(features_list, "group")]
+mdat_df <- dat_df
+# mdat_df <- reshape(mdat_df, direction = "wide", timevar = "group")
+mdat_df <- spread(
+  data = mdat_df,
+  key = "group",
+  value = features_list
+)
+# mdat = list('grp'=gl(3,4), 'ngrp'=3, 'N'=12, 'y'=c(2,1,3,2, 2,6,2,2, 6,10,7,5))
+# mdat <- list(
+#   
+# )
+# quick visualization of the data
+# disp.mdat = matrix(mdat$y,ncol=mdat$ngrp,
+#                    dimnames = list(paste('obs',1:(mdat$N/mdat$ngrp),sep=' '),
+#                                    paste('group',1:mdat$ngrp,sep=' '))) 
 ```
 
 #![Here is a Crab](images/bayes_thereom.png)
