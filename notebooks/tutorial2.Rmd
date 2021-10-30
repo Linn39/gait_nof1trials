@@ -195,6 +195,7 @@ data.list <- with(dat_df, list(y = y, X = X, n = nrow(dat_df), ngroups = ncol(X)
 ```
 
 ```{r}
+# Define the nodes (parameters and derivatives) to monitor and the chain parameters.
 params <- c("beta", "sigma")
 nChains = 2
 burnInSteps = 3000
@@ -204,9 +205,16 @@ nIter = ceiling(burnInSteps + (numSavedSteps * thinSteps)/nChains)
 ```
 
 ```{r}
-data.r2jags <- jags(data = data.list, inits = NULL, parameters.to.save = params,
-                    model.file = "fact_anovaModel.txt", n.chains = nChains, n.iter = nIter,
-                    n.burnin = burnInSteps, n.thin = thinSteps)
+data.r2jags <- jags(
+  data = data.list, 
+  inits = NULL, 
+  parameters.to.save = params,
+  model.file = "fact_anovaModel.txt", 
+  n.chains = nChains, 
+  n.iter = nIter,
+  n.burnin = burnInSteps, 
+  n.thin = thinSteps
+)
 ```
 ```{r}
 print(data.r2jags)
@@ -219,9 +227,15 @@ denplot(data.r2jags, parms = c("beta"))
 ```
 
 ```{r}
-traplot(data.r2jags, parms = c("beta"))
+traplot(data.r2jags, parms = c("beta", "sigma"))
 ```
 
+```{r}
+library(coda)
+data.mcmc = as.mcmc(data.r2jags)
+#Autocorrelation diagnostic
+autocorr.diag(data.mcmc)
+```
 
 Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
 
