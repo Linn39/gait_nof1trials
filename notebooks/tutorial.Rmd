@@ -53,11 +53,20 @@ load_gait_parameters <- function (folder_path, keyword, subject, test, cond) {
   
   #### then load the data ####
   if (grepl("windowed", keyword, fixed = TRUE)) {
-    folder_path <- file.path("../../fatigue_gait/data/processed", dataset, "features")
-    
+    folder_path <- file.path("../../fatigue_gait/data_publish/processed", "features")
+    data_path <- file.path(folder_path, file_name)
+    dat_df <- readr::read_csv(data_path, col_names = T, show_col_types = FALSE)
+    # dat_df <- dat_df[(dat_df$)]
   }
   else {
-    folder_path <- file.path("../../fatigue_gait/data/processed_publish", dataset, paste0("OG_", cond, "_", test), sub)
+    folder_path <- file.path("../../fatigue_gait/data_publish/processed", paste0("OG_", cond, "_", test), sub)
+    data_path <- file.path(folder_path, file_name)
+    dat_df <- readr::read_csv(data_path, col_names = T, show_col_types = FALSE)
+    # remove outlier strides
+    loc_df <- loc_df[(dat_df$is_outlier == FALSE) & 
+                     (dat_df$turning_interval == FALSE) & 
+                     (dat_df$interrupted == FALSE),
+                     ]
   }
   
   data_path <- file.path(folder_path, file_name)
@@ -68,19 +77,20 @@ load_gait_parameters <- function (folder_path, keyword, subject, test, cond) {
 
 
 ## load & concat .csv file
-dataset <- "fatigue_dual_task"
+# dataset <- "fatigue_dual_task"
 cond_list <- list("dt", "st")
 test_list <- list("fatigue", "control")
 IMU_loc <- list('LFRF_windowed')  # LFRF_windowed, LF, RF
+kw <- IMU_loc[[1]]  # safety measure, for now we only load one location at a time
 
 sub_list <- list(  # for n-of-1 trials, select only one subject!
-  "sub_01"
+  # "sub_01"
   # "sub_02",
   # "sub_03",
   # "sub_05",
   # "sub_06",
   # "sub_07",
-  # "sub_08",
+  "sub_08"
   # "sub_09",
   # "sub_10",
   # "sub_11",
@@ -96,7 +106,7 @@ sub_list <- list(  # for n-of-1 trials, select only one subject!
 #   
 # dat <- readr::read_csv(file_path, col_names = T)
 
-if (grepl("windowed", IMU_loc[1], fixed = TRUE)) {
+if (grepl("windowed", kw, fixed = TRUE)) {
   # read windowed parameters from only one file
   loc_df <- load_gait_parameters(folder_path, kw,  sub, test, cond)
   print(nrow(loc_df))
@@ -107,10 +117,10 @@ if (grepl("windowed", IMU_loc[1], fixed = TRUE)) {
     for (test in test_list) {
       for (sub in sub_list) {
         for (kw in IMU_loc) {
-          dat_df_temp <- load_gait_parameters(folder_path, kw,  sub, test, cond)
-          print(nrow(dat_df_temp))
-          loc_df <- rbind(loc_df, dat_df_temp)
-          print(nrow(loc_df))
+          dat_df_temp <- load_gait_parameters(folder_path, kw, sub, test, cond)
+          dat_df_temp["fatigue"] <- test
+          dat_df_temp["condition"] <- cond
+          loc_df <- bind_rows(loc_df, dat_df_temp)
         }
       }
     }
@@ -151,7 +161,7 @@ features_list <- c(
 
 # compose the datafram used for further analysis
 dat_df <- filter(loc_df, sub == sub_list[1])
-dat_df <- dat_df[, c(features_list, "fatigue", "condition")]
+# dat_df <- dat_df[, c(features_list, "fatigue", "condition")]
 ```
 
 #![Here is a Crab](images/bayes_thereom.png)
