@@ -217,6 +217,7 @@ data.r2jags <- jags(
 print("")
 print(data.r2jags)
 ```
+
 ```{r}
 # compare to frequentist regression model
 mod.aov <- lm(y ~ fatigue + condition, data = dat_df)
