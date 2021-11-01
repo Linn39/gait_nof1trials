@@ -131,7 +131,7 @@ features_list <- c(
   # 'swing_times_avg', 
   # 'stance_times_avg',
   # 'stance_ratios_avg', 
-  # 'cadence_avg', 
+  # 'cadence_avg'
   'speed_avg'
   # 'stride_lengths_CV',
   # 'clearances_min_CV', 
@@ -178,9 +178,9 @@ modelString = "
   }
   #Priors
   for (i in 1:ngroups) {
-  beta[i] ~ dnorm(0, 1.0E-6) 
+  beta[i] ~ dnorm(0, 1.0E-6)  # 1.0E-3
   }
-  sigma ~ dunif(0, 100)
+  sigma ~ dunif(0, 100)   # 10, 1000
   tau <- 1 / (sigma * sigma)
   }
 "
@@ -218,15 +218,16 @@ data.r2jags <- jags(
 print("\n")
 print(data.r2jags)
 ```
-```{r}
-library(car)
-my_anova <- aov(y ~ fatigue * condition, data = dat_df)
-Anova(my_anova, type = "II")
+
+```{r} 
+# calculate mean for dt_control (the "reference" group, beta[1])
+D <- dat_df[dat_df$fatigue == "control" & dat_df$condition == "dt",]
+mean(D$y)
 ```
 
 ```{r}
 # compare to frequentist regression model
-mod.aov <- lm(y ~ fatigue + condition, data = dat_df)
+mod.aov <- lm(y ~ fatigue * condition, data = dat_df)
 summary(mod.aov)
 ```
 
