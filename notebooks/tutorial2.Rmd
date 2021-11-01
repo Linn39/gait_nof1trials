@@ -124,7 +124,7 @@ if (grepl("windowed", kw, fixed = TRUE)) {
 
 # select list of features
 features_list <- c(
-  'stride_lengths_avg'
+  # 'stride_lengths_avg'
   # 'clearances_min_avg', 
   # 'clearances_max_avg',
   # 'stride_times_avg', 
@@ -132,7 +132,7 @@ features_list <- c(
   # 'stance_times_avg',
   # 'stance_ratios_avg', 
   # 'cadence_avg', 
-  # 'speed_avg', 
+  'speed_avg'
   # 'stride_lengths_CV',
   # 'clearances_min_CV', 
   # 'clearances_max_CV', 
@@ -163,6 +163,7 @@ dat_df <- rename(dat_df,c('y' = features_list[1]))
 ```{r}
 with(dat_df, interaction.plot(fatigue, condition, y))
 ```
+
 ```{r}
  ggplot(dat_df, aes(y = y, x = condition, fill = fatigue)) + geom_boxplot()
 ```
@@ -214,8 +215,13 @@ data.r2jags <- jags(
   n.thin = thinSteps
 )
 
-print("")
+print("\n")
 print(data.r2jags)
+```
+```{r}
+library(car)
+my_anova <- aov(y ~ fatigue * condition, data = dat_df)
+Anova(my_anova, type = "II")
 ```
 
 ```{r}
