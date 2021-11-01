@@ -190,7 +190,7 @@ writeLines(modelString, con = "fact_anovaModel.txt")
 
 ```{r}
 # Arrange the data as a list (as required by JAGS)
-X <- model.matrix(~condition * fatigue, dat_df)
+X <- model.matrix(~condition * fatigue, dat_df)   # X is the design matrix, including intercept
 data.list <- with(dat_df, list(y = y, X = X, n = nrow(dat_df), ngroups = ncol(X)))
 ```
 
@@ -202,9 +202,7 @@ burnInSteps = 3000
 thinSteps = 1
 numSavedSteps = 15000  #across all chains
 nIter = ceiling(burnInSteps + (numSavedSteps * thinSteps)/nChains)
-```
 
-```{r}
 data.r2jags <- jags(
   data = data.list, 
   inits = NULL, 
@@ -215,12 +213,17 @@ data.r2jags <- jags(
   n.burnin = burnInSteps, 
   n.thin = thinSteps
 )
-```
-```{r}
+
+print("")
 print(data.r2jags)
 ```
-## MCMC diagnostics
+```{r}
+# compare to frequentist regression model
+mod.aov <- lm(y ~ fatigue + condition, data = dat_df)
+summary(mod.aov)
+```
 
+## MCMC diagnostics
 ```{r}
 library(mcmcplots)
 denplot(data.r2jags, parms = c("beta"))
