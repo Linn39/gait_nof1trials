@@ -178,9 +178,9 @@ modelString = "
   }
   #Priors
   for (i in 1:ngroups) {
-  beta[i] ~ dnorm(0, 1.0E-6)  # 1.0E-3
+  beta[i] ~ dnorm(0, 1.0E-3)
   }
-  sigma ~ dunif(0, 100)   # 10, 1000
+  sigma ~ dunif(0, 100)
   tau <- 1 / (sigma * sigma)
   }
 "
@@ -190,33 +190,42 @@ writeLines(modelString, con = "fact_anovaModel.txt")
 ```
 
 ```{r}
-# Arrange the data as a list (as required by JAGS)
-X <- model.matrix(~condition * fatigue, dat_df)   # X is the design matrix, including intercept
-data.list <- with(dat_df, list(y = y, X = X, n = nrow(dat_df), ngroups = ncol(X)))
+run_jags <- function(df, model_file) {
+  # Arrange the data as a list (as required by JAGS)
+  X <- model.matrix(~condition * fatigue, df)   # X is the design matrix, including intercept
+  data.list <- with(df, list(y = y, X = X, n = nrow(df), ngroups = ncol(X)))
+  
+  # Define the nodes (parameters and derivatives) to monitor and the chain parameters.
+  params <- c("beta", "sigma")
+  nChains = 2
+  burnInSteps = 3000
+  thinSteps = 1
+  numSavedSteps = 15000  #across all chains
+  nIter = ceiling(burnInSteps + (numSavedSteps * thinSteps)/nChains)
+  
+  data.r2jags <- jags(
+    data = data.list, 
+    inits = NULL, 
+    parameters.to.save = params,
+    model.file = model_file, 
+    n.chains = nChains, 
+    n.iter = nIter,
+    n.burnin = burnInSteps, 
+    n.thin = thinSteps
+  )
+  # browser()
+  cat("\n")
+  print(data.r2jags)
+  
+  return(data.r2jags)
+}
+data.r2jags <- run_jags(dat_df, "fact_anovaModel.txt")
+  
 ```
-
 ```{r}
-# Define the nodes (parameters and derivatives) to monitor and the chain parameters.
-params <- c("beta", "sigma")
-nChains = 2
-burnInSteps = 3000
-thinSteps = 1
-numSavedSteps = 15000  #across all chains
-nIter = ceiling(burnInSteps + (numSavedSteps * thinSteps)/nChains)
-
-data.r2jags <- jags(
-  data = data.list, 
-  inits = NULL, 
-  parameters.to.save = params,
-  model.file = "fact_anovaModel.txt", 
-  n.chains = nChains, 
-  n.iter = nIter,
-  n.burnin = burnInSteps, 
-  n.thin = thinSteps
-)
-
-print("\n")
-print(data.r2jags)
+jags_df <- data.frame(data.r2jags$BUGSoutput$summary)
+jags_df$sub <- sub_list[1]
+jags_df$var <- features_list[1]
 ```
 
 ```{r} 
