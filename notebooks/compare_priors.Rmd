@@ -12,9 +12,11 @@ library(dplyr)
 library(ggplot2)
 library(RColorBrewer)
 
+gait_parameter <- "SL"
+
 file_names = c(
-  "all_estimates_speed_prior.csv",
-  "all_estimates_speed_default.csv"
+  paste0("all_estimates_", gait_parameter, "_default.csv"),
+  paste0("all_estimates_", gait_parameter, "_prior.csv")
 )
 
 df_list <- list()
@@ -28,22 +30,13 @@ for (i in 1:length(file_names)) {
 }
 all_est_df <- bind_rows(df_list)
 
-# p <- ggplot(
-#   est_df[est_df$parameter != "deviance", ],
-#   aes(x=parameter, y=mean)
-#   ) +
-#   geom_boxplot()+
-#   geom_jitter(shape=16, position=position_jitter(0.2)) +
-#   scale_color_brewer(palette="Dark2")
-# 
-# p
-
 p <- ggplot(
   data = all_est_df, 
-  aes(x=parameter, y=mean)) + 
+  aes(x=parameter, y=sd)) + 
   geom_boxplot(aes(fill=as.factor(model))) + 
-  geom_point(aes(y=mean, group=model), position = position_dodge(width=0.75)) + 
-  guides(fill=guide_legend(title="Likelihood Model"))
+  geom_point(aes(y=sd, group=model), position = position_dodge(width=0.75)) + 
+  guides(fill=guide_legend(title="Likelihood Model")) + 
+  ggtitle(paste0(gait_parameter, " estimation from all 16 subjects"))
 p + facet_wrap( ~ parameter, scales="free")
 ```
 
