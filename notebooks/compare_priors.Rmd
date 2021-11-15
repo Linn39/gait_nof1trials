@@ -12,11 +12,11 @@ library(dplyr)
 library(ggplot2)
 library(RColorBrewer)
 
-gait_parameter <- "SL"
+gait_parameter <- "cadence"
 
 file_names = c(
   paste0("all_estimates_", gait_parameter, "_default.csv"),
-  paste0("all_estimates_", gait_parameter, "_prior.csv")
+  paste0("all_estimates_", gait_parameter, "_sigma1000.csv")   # prior
 )
 
 df_list <- list()
@@ -32,9 +32,9 @@ all_est_df <- bind_rows(df_list)
 
 p <- ggplot(
   data = all_est_df, 
-  aes(x=parameter, y=sd)) + 
+  aes(x=parameter, y=mean)) + 
   geom_boxplot(aes(fill=as.factor(model))) + 
-  geom_point(aes(y=sd, group=model), position = position_dodge(width=0.75)) + 
+  geom_point(aes(y=mean, group=model), position = position_dodge(width=0.75)) + 
   guides(fill=guide_legend(title="Likelihood Model")) + 
   ggtitle(paste0(gait_parameter, " estimation from all 16 subjects"))
 p + facet_wrap( ~ parameter, scales="free")

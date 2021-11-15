@@ -6,9 +6,8 @@
   mean[i] <- inprod(beta[],X[i,])
   }
   #Priors
-  beta[1] ~ dnorm(0,1.0E-3)
-  for(i in 2:ngroups){
-  beta[i] ~ dnorm(0,1.0E-3) 
+  for (i in 1:ngroups) {
+  beta[i] ~ dnorm(1.1, 0.02)
   }
   sigma ~ dunif(0, 100)
   tau <- 1 / (sigma * sigma)

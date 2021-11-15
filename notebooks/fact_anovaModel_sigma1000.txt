@@ -10,7 +10,7 @@
   for(i in 2:ngroups){
   beta[i] ~ dnorm(0,1.0E-3) 
   }
-  sigma ~ dunif(0, 100)
+  sigma ~ dunif(0, 1000)
   tau <- 1 / (sigma * sigma)
   }
 
