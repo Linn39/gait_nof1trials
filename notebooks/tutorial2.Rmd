@@ -216,6 +216,11 @@ get_jags_table <- function(jags_data, sub, var) {
   jags_df$sub <- sub
   jags_df$var <- var
   
+  # move index to column
+  # jags_df$parameter <- rownames(jags_df)
+  jags_df <- cbind(parameter = rownames(jags_df), jags_df)
+  rownames(jags_df) <- 1:nrow(jags_df)
+  
   return(jags_df)
 }
 
@@ -224,7 +229,8 @@ get_jags_table <- function(jags_data, sub, var) {
 ```
 
 ```{r}
-# compose the datafram used for further analysis
+# loop through all subjects and all features
+all_estimate_df <- data.frame()
 for (subject in sub_list) {
   for (feature in features_list) {
     # filter the dataframe
@@ -232,17 +238,23 @@ for (subject in sub_list) {
     dat_df <- dat_df[, c(feature, "fatigue", "condition")]
     dat_df <- rename(dat_df,c('y' = feature))
     
-    # viasualizing the data (optional)
-    with(dat_df, interaction.plot(fatigue, condition, y, main=paste(subject, feature)))
-    ggplot(dat_df, aes(y = y, x = condition, fill = fatigue), main=paste(subject, feature)) + geom_boxplot()
+    # # viasualizing the data (optional)
+    # with(dat_df, interaction.plot(fatigue, condition, y, main=paste(subject, feature)))
+    # ggplot(dat_df, aes(y = y, x = condition, fill = fatigue), main=paste(subject, feature)) + geom_boxplot()
     
     # run jags
-    # data.r2jags <- run_jags(dat_df, "fact_anovaModel.txt")
+    data.r2jags <- run_jags(dat_df, "fact_anovaModel.txt")
     
     # save jags data
-    
+    all_estimate_df <- bind_rows(all_estimate_df, get_jags_table(data.r2jags, subject, feature))
   }
 }
+
+write.csv(
+  all_estimate_df, 
+  file = file.path("..", "data", "processed", "all_estimates.csv"), 
+  row.names=FALSE
+)
 
 
 ```
