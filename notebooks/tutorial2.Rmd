@@ -175,7 +175,7 @@ modelString = "
 "
 
 ## write the model to a text file
-writeLines(modelString, con = "fact_anovaModel_default.txt")
+writeLines(modelString, con = file.path("..", "likelihood_models", "fact_anovaModel_default.txt"))
 ```
 
 ```{r}
@@ -242,7 +242,7 @@ for (subject in sub_list) {
     # ggplot(dat_df, aes(y = y, x = condition, fill = fatigue), main=paste(subject, feature)) + geom_boxplot()
     
     # run jags
-    data.r2jags <- run_jags(dat_df, "fact_anovaModel_sigma1000.txt")
+    data.r2jags <- run_jags(dat_df, file.path("..", "likelihood_models", "fact_anovaModel_default.txt"))
     
     # save jags data
     all_estimate_df <- bind_rows(all_estimate_df, get_jags_table(data.r2jags, subject, feature))
@@ -251,7 +251,7 @@ for (subject in sub_list) {
 
 write.csv(
   all_estimate_df, 
-  file = file.path("..", "data", "processed", "all_estimates_cadence_sigma1000.csv"), 
+  file = file.path("..", "data", "processed", "all_estimates.csv"), 
   row.names=FALSE
 )
 
