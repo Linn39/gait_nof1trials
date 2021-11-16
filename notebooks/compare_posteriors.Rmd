@@ -1,0 +1,61 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+```{r}
+rm(list = ls())
+
+suppressMessages(library(plotly))
+library(ggplot2)
+
+data_path <- file.path("..", "data", "processed", "all_estimates.csv")
+all_est_df <- readr::read_csv(data_path, col_names = T, show_col_types = FALSE)
+
+fig <- plot_ly(
+  all_est_df[all_est_df$parameter != "deviance", ], 
+  x = ~var, y = ~mean, 
+  color = ~parameter,
+  type = "box",
+  boxpoints = "all", jitter = 0.3
+  ) 
+  # + facet_wrap( ~ var, ncol=2)
+fig <- fig %>% layout(boxmode = "group")
+
+fig
+```
+```{r}
+gait_parameter_list <- list(
+  "stride_lengths_avg",
+  "stride_times_avg",
+  "cadence_avg",
+  "speed_avg"
+)
+
+for (gait_parameter in gait_parameter_list) {
+  p <- ggplot(
+  data = all_est_df[(all_est_df$var == gait_parameter) & (all_est_df$parameter != "deviance"), ], 
+  aes(x=parameter, y=mean)) + 
+  geom_boxplot() +
+  # geom_boxplot(aes(fill=as.factor(gait_parameter))) + 
+  geom_point(aes(y=mean, group=gait_parameter), position = position_dodge(width=0.75)) + 
+  guides(fill=guide_legend(title="Likelihood Model")) + 
+  ggtitle(paste0(gait_parameter, " estimation from all 16 subjects"))
+  p + facet_wrap( ~ parameter, scales="free")
+  
+  print(p)
+}
+
+```
+
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
