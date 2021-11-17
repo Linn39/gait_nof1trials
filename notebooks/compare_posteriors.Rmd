@@ -37,11 +37,16 @@ gait_parameter_list <- list(
 )
 
 for (gait_parameter in gait_parameter_list) {
+  plot_est_df <- all_est_df[(all_est_df$var == gait_parameter) & (all_est_df$parameter != "deviance"), ]
+  fun_mean <- function(x){
+  return(data.frame(y=mean(x),label=round(mean(x,na.rm=T), digits = 4)))}
+  
   p <- ggplot(
-  data = all_est_df[(all_est_df$var == gait_parameter) & (all_est_df$parameter != "deviance"), ], 
+  data = plot_est_df, 
   aes(x=parameter, y=mean)) + 
   geom_boxplot() +
-  # geom_boxplot(aes(fill=as.factor(gait_parameter))) + 
+  stat_summary(fun.y = mean, geom="point",color="darkred", size=3) +
+  stat_summary(fun.data = fun_mean, geom="text", vjust=-0.7) +
   geom_point(aes(y=mean, group=gait_parameter), position = position_dodge(width=0.75)) + 
   guides(fill=guide_legend(title="Likelihood Model")) + 
   ggtitle(paste0(gait_parameter, " estimation from all 16 subjects"))
