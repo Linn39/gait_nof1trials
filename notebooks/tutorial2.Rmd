@@ -179,9 +179,29 @@ writeLines(modelString, con = file.path("..", "likelihood_models", "fact_anovaMo
 ```
 
 ```{r}
+
+append_time <- function(X) {
+  ### append time column (incremental integers) for each walking session
+Q
+  X_diff <- data.frame(diff(X))
+  idx_df <- X_diff[X_diff$conditionst != 0 | X_diff$fatiguefatigue != 0,]
+  
+  # get all start and end points of time series
+  idx_int <- as.integer(rownames(idx_df)) - 1
+  idx_int <- append(idx_int, 1, after = 0)
+  idx_int <- append(idx_int, dim(X)[1])
+  
+  X_time <- rep(NA, dim(X)[1])  # empty vector to host the times
+  for (i in 1:length(idx_int)-1) {
+    X_time[(idx_int[i] + 1):idx_int[i+1]] <- 1:(idx_int[i+1]-idx_int[i])
+    browser()
+  }
+}
+
 run_jags <- function(df, model_file) {
   # Arrange the data as a list (as required by JAGS)
   X <- model.matrix(~condition * fatigue, df)   # X is the design matrix, including intercept
+  append_time(X)  # append the time column to X
   data.list <- with(df, list(y = y, X = X, n = nrow(df), ngroups = ncol(X)))
   
   # Define the nodes (parameters and derivatives) to monitor and the chain parameters.
