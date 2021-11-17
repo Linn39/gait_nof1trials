@@ -19,6 +19,7 @@ all_est_df <- readr::read_csv(data_path, col_names = T, show_col_types = FALSE)
 fig <- plot_ly(
   all_est_df[all_est_df$parameter != "deviance", ], 
   x = ~var, y = ~mean, 
+  text = ~paste('Subject: ', sub),
   color = ~parameter,
   type = "box",
   boxpoints = "all", jitter = 0.3
