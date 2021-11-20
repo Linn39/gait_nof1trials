@@ -128,7 +128,7 @@ features_list <- c(
   # 'clearances_min_avg', 
   # 'clearances_max_avg',
   'stride_times_avg',
-  # 'swing_times_avg', 
+  # 'swing_times_avg',
   # 'stance_times_avg',
   # 'stance_ratios_avg', 
   'cadence_avg',
@@ -194,14 +194,15 @@ append_time <- function(X) {
   X_time <- rep(NA, dim(X)[1])  # empty vector to host the times
   for (i in 1:(length(idx_int)-1)) {
     X_time[(idx_int[i] + 1):idx_int[i+1]] <- 1:(idx_int[i+1]-idx_int[i])
-    browser()
   }
+  
+  return(cbind(X, X_time))
 }
 
 run_jags <- function(df, model_file) {
   # Arrange the data as a list (as required by JAGS)
   X <- model.matrix(~condition * fatigue, df)   # X is the design matrix, including intercept
-  append_time(X)  # append the time column to X
+  X <- append_time(X)  # append the time column to X
   data.list <- with(df, list(y = y, X = X, n = nrow(df), ngroups = ncol(X)))
   
   # Define the nodes (parameters and derivatives) to monitor and the chain parameters.
@@ -269,9 +270,11 @@ for (subject in sub_list) {
   }
 }
 
+output_folder <- file.path("..", "data", "ANCOVA_with_time")
+dir.create(output_folder, showWarnings = FALSE)
 write.csv(
   all_estimate_df, 
-  file = file.path("..", "data", "processed", "all_estimates.csv"), 
+  file = file.path(output_folder, "all_estimates.csv"), 
   row.names=FALSE
 )
 
