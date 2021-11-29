@@ -121,6 +121,11 @@ if (grepl("windowed", kw, fixed = TRUE)) {
   }
 }
 
+# rename the label columns to 1 and 0
+loc_df$fatigue[loc_df$fatigue == "control"] <- 0
+loc_df$fatigue[loc_df$fatigue == "fatigue"] <- 1
+loc_df$condition[loc_df$condition == "st"] <- 0
+loc_df$condition[loc_df$condition == "dt"] <- 1
 
 # select list of features
 features_list <- c(
