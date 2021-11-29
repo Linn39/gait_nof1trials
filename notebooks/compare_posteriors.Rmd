@@ -13,7 +13,7 @@ rm(list = ls())
 suppressMessages(library(plotly))
 library(ggplot2)
 
-data_path <- file.path("..", "data", "processed", "all_estimates.csv")
+data_path <- file.path("..", "data", "ANCOVA_with_time", "all_estimates.csv")
 all_est_df <- readr::read_csv(data_path, col_names = T, show_col_types = FALSE)
 
 fig <- plot_ly(
@@ -47,7 +47,7 @@ for (gait_parameter in gait_parameter_list) {
   aes(x=parameter, y=mean)) + 
   geom_boxplot() +
   stat_summary(fun.y = mean, geom="point",color="darkred", size=3) +
-  stat_summary(fun.data = fun_mean, geom="text", vjust=-0.7) +
+  stat_summary(fun.data = fun_mean, geom="text") +
   geom_point(aes(y=mean, group=gait_parameter), position = position_dodge(width=0.75)) + 
   guides(fill=guide_legend(title="Likelihood Model")) + 
   ggtitle(paste0(gait_parameter, " estimation from all 16 subjects"))
