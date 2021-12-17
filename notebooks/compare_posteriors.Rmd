@@ -8,12 +8,12 @@ This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute
 Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
 
 ```{r}
-rm(list = ls())
+# rm(list = ls())
 
 suppressMessages(library(plotly))
 library(ggplot2)
 
-data_path <- file.path("..", "data", "ANCOVA_with_time", "all_estimates.csv")
+data_path <- file.path("..", "data", "ANOVA_try_prior", "all_estimates_default.csv")
 all_est_df <- readr::read_csv(data_path, col_names = T, show_col_types = FALSE)
 
 fig <- plot_ly(
@@ -46,7 +46,7 @@ for (gait_parameter in gait_parameter_list) {
   data = plot_est_df, 
   aes(x=parameter, y=mean)) + 
   geom_boxplot() +
-  stat_summary(fun.y = mean, geom="point",color="darkred", size=3) +
+  stat_summary(fun = mean, geom="point",color="darkred", size=3) +
   stat_summary(fun.data = fun_mean, geom="text") +
   geom_point(aes(y=mean, group=gait_parameter), position = position_dodge(width=0.75)) + 
   guides(fill=guide_legend(title="Likelihood Model")) + 
