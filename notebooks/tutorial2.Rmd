@@ -281,7 +281,7 @@ sigma2 = pow(sigma,2)
 "
 
 ## write the model to a text file
-writeLines(modelString, con = file.path("..", "likelihood_models", "mixed_model_AR1.txt"))
+writeLines(modelString, con = file.path("..", "likelihood_models", "mixed_model_CS.txt"))
 ```
 
 ```{r}
