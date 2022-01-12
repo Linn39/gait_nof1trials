@@ -13,7 +13,8 @@ opts_chunk$set(echo=TRUE, comment='')
 options(knitr.table.format = "latex")
 
 #### choose a model
-likelihood_model <- "fact_anovaModel_default.txt"
+likelihood_model <- "mixed_model_AR1.txt"
+# "fact_anovaModel_default.txt"
 
 #### load gait data
 load_gait_parameters <- function (folder_path, keyword, subject, test, cond) {
@@ -116,12 +117,12 @@ features_list <- c(
   'stride_lengths_avg',
   # 'clearances_min_avg', 
   # 'clearances_max_avg',
-#   'stride_times_avg',
+  'stride_times_avg',
   # 'swing_times_avg',
   # 'stance_times_avg',
   # 'stance_ratios_avg', 
-#   'cadence_avg',
-#   'speed_avg'
+  'cadence_avg',
+  'speed_avg'
   # 'stride_lengths_CV',
   # 'clearances_min_CV', 
   # 'clearances_max_CV', 
@@ -228,23 +229,23 @@ for (subject in sub_list) {
     
     # run jags
     # run_jags.options(silent.jags=TRUE, silent.runjags=TRUE)
-    data.r2jags <- run_jags(dat_df, file.path("..", "likelihood_models", likelihood_model))
+    data.r2jags <- run_jags(dat_df, file.path("likelihood_models", likelihood_model))
     
     # save jags data
     all_estimate_df <- bind_rows(all_estimate_df, get_jags_table(data.r2jags, subject, feature))
   }
 }
 
-output_folder <- file.path("..", "data", "ANOVA_try_prior")
+output_folder <- file.path("data", "processed", "jags_output")
 dir.create(output_folder, showWarnings = FALSE)
 write.csv(
   all_estimate_df, 
-  file = file.path(output_folder, "all_estimates_default.csv"), 
+  file = file.path(output_folder, "all_estimates_AR1.csv"), 
   row.names=FALSE
 )
 
 # save simulation outputs
-save(data.r2jags, file = file.path("data", "mixed_model_time", "data_r2jags.RData"))
+save(data.r2jags, file = file.path(output_folder, "data_r2jags_AR1.RData"))
 
 
 
