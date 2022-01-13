@@ -1,5 +1,6 @@
 rm(list = ls())
 
+library(tictoc)
 library(ggplot2)
 library(R2jags)
 library(lattice)
@@ -11,6 +12,9 @@ library(tidyr)
 opts_chunk$set(echo=TRUE, comment='') 
 # for nicely formatted tables 
 options(knitr.table.format = "latex")
+
+tic("start running")
+print("start running...")
 
 #### choose a model
 likelihood_model <- "mixed_model_AR1.txt"
@@ -38,7 +42,7 @@ load_gait_parameters <- function (folder_path, keyword, subject, test, cond) {
   if (grepl("windowed", keyword, fixed = TRUE)) {
     folder_path <- file.path("data/processed", "features")
     data_path <- file.path(folder_path, file_name)
-    dat_df <- readr::read_csv(data_path, col_names = T, show_col_types = FALSE)
+    dat_df <- readr::read_csv(data_path, col_names = T, show_col_types = FALSE)  
     # dat_df <- dat_df[(dat_df$)]
   }
   else {
@@ -67,22 +71,22 @@ IMU_loc <- list('LFRF_windowed')  # LFRF_windowed, LF, RF
 kw <- IMU_loc[[1]]  # safety measure, for now we only load one location at a time
 
 sub_list <- list(  # for n-of-1 trials, select only one subject!
-  "sub_01",
-  "sub_02",
-  "sub_03",
-  "sub_05",
-  "sub_06",
-  "sub_07",
-  "sub_08",
-  "sub_09",
-  "sub_10",
-  "sub_11",
-  "sub_12",
-  "sub_13",
-  "sub_14",
-  "sub_15",
-  "sub_17",
-  "sub_18"
+  "sub_01"
+  # "sub_02",
+  # "sub_03",
+  # "sub_05",
+  # "sub_06",
+  # "sub_07",
+  # "sub_08",
+  # "sub_09",
+  # "sub_10",
+  # "sub_11",
+  # "sub_12",
+  # "sub_13",
+  # "sub_14",
+  # "sub_15",
+  # "sub_17",
+  # "sub_18"
   )
 
 if (grepl("windowed", kw, fixed = TRUE)) {
@@ -114,15 +118,15 @@ loc_df$condition[loc_df$condition == "dt"] <- 1
 
 # select list of features
 features_list <- c(
-  'stride_lengths_avg',
+  'stride_lengths_avg'
   # 'clearances_min_avg', 
   # 'clearances_max_avg',
-  'stride_times_avg',
+  # 'stride_times_avg',
   # 'swing_times_avg',
   # 'stance_times_avg',
   # 'stance_ratios_avg', 
-  'cadence_avg',
-  'speed_avg'
+  # 'cadence_avg',
+  # 'speed_avg'
   # 'stride_lengths_CV',
   # 'clearances_min_CV', 
   # 'clearances_max_CV', 
@@ -178,7 +182,7 @@ run_jags <- function(df, model_file) {
   numSavedSteps = 15000  #across all chains
   nIter = ceiling(burnInSteps + (numSavedSteps * thinSteps)/nChains)
   
-  data.r2jags <- jags(
+  data.r2jags <- jags.parallel(
     data = data.list, 
     inits = NULL, 
     parameters.to.save = params,
@@ -247,5 +251,6 @@ write.csv(
 # save simulation outputs
 save(data.r2jags, file = file.path(output_folder, "data_r2jags_AR1.RData"))
 
-
+print("...finished running")
+toc()
 
