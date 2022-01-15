@@ -17,8 +17,27 @@ tic("start running")
 print("start running...")
 
 #### choose a model
-likelihood_model <- "mixed_model_AR1.txt"
-# "fact_anovaModel_default.txt"
+# likelihood_model <- "mixed_model_CS.txt"
+# # "mixed_model_AR1.txt"
+# # "mixed_model_CS.txt"
+# # "mixed_model_lagged_res.txt"
+# # "fact_anovaModel_default.txt"
+
+model_n <- 4
+
+likelihood_models <- list(
+  "fact_anovaModel_default.txt",
+  "mixed_model_lagged_res.txt",
+  "mixed_model_AR1.txt",
+  "mixed_model_CS.txt"
+)
+
+model_names <- list(
+  "default",
+  "lagged_res",
+  "AR1",
+  "CS"
+)
 
 #### load gait data
 load_gait_parameters <- function (folder_path, keyword, subject, test, cond) {
@@ -233,7 +252,7 @@ for (subject in sub_list) {
     
     # run jags
     # run_jags.options(silent.jags=TRUE, silent.runjags=TRUE)
-    data.r2jags <- run_jags(dat_df, file.path("likelihood_models", likelihood_model))
+    data.r2jags <- run_jags(dat_df, file.path("likelihood_models", likelihood_model[[model_n]]))
     
     # save jags data
     all_estimate_df <- bind_rows(all_estimate_df, get_jags_table(data.r2jags, subject, feature))
@@ -244,12 +263,12 @@ output_folder <- file.path("data", "processed", "jags_output")
 dir.create(output_folder, showWarnings = FALSE)
 write.csv(
   all_estimate_df, 
-  file = file.path(output_folder, "all_estimates_AR1.csv"), 
+  file = file.path(output_folder, paste0("all_estimates_", model_names[[model_n]], ".csv"), 
   row.names=FALSE
 )
 
 # save simulation outputs
-save(data.r2jags, file = file.path(output_folder, "data_r2jags_AR1.RData"))
+save(data.r2jags, file = file.path(output_folder, paste0("data_r2jags_", model_names[[model_n]], ".RData")))
 
 print("...finished running")
 toc()
