@@ -17,13 +17,8 @@ tic("start running")
 print("start running...")
 
 #### choose a model
-# likelihood_model <- "mixed_model_CS.txt"
-# # "mixed_model_AR1.txt"
-# # "mixed_model_CS.txt"
-# # "mixed_model_lagged_res.txt"
-# # "fact_anovaModel_default.txt"
 
-model_n <- 4
+model_n <- 3
 
 likelihood_models <- list(
   "fact_anovaModel_default.txt",
@@ -38,6 +33,7 @@ model_names <- list(
   "AR1",
   "CS"
 )
+print(likelihood_models[[model_n]])
 
 #### load gait data
 load_gait_parameters <- function (folder_path, keyword, subject, test, cond) {
@@ -90,9 +86,9 @@ IMU_loc <- list('LFRF_windowed')  # LFRF_windowed, LF, RF
 kw <- IMU_loc[[1]]  # safety measure, for now we only load one location at a time
 
 sub_list <- list(  # for n-of-1 trials, select only one subject!
-  "sub_01"
-  # "sub_02",
-  # "sub_03",
+  # "sub_01"
+  # "sub_02"
+  "sub_03"
   # "sub_05",
   # "sub_06",
   # "sub_07",
@@ -227,7 +223,6 @@ get_jags_table <- function(jags_data, sub, var) {
   jags_df$var <- var
   
   # move index to column
-  # jags_df$parameter <- rownames(jags_df)
   jags_df <- cbind(parameter = rownames(jags_df), jags_df)
   rownames(jags_df) <- 1:nrow(jags_df)
   
@@ -252,7 +247,7 @@ for (subject in sub_list) {
     
     # run jags
     # run_jags.options(silent.jags=TRUE, silent.runjags=TRUE)
-    data.r2jags <- run_jags(dat_df, file.path("likelihood_models", likelihood_model[[model_n]]))
+    data.r2jags <- run_jags(dat_df, file.path("likelihood_models", likelihood_models[[model_n]]))
     
     # save jags data
     all_estimate_df <- bind_rows(all_estimate_df, get_jags_table(data.r2jags, subject, feature))
@@ -261,9 +256,11 @@ for (subject in sub_list) {
 
 output_folder <- file.path("data", "processed", "jags_output")
 dir.create(output_folder, showWarnings = FALSE)
+
+# save estimated parameters table
 write.csv(
   all_estimate_df, 
-  file = file.path(output_folder, paste0("all_estimates_", model_names[[model_n]], ".csv"), 
+  file = file.path(output_folder, paste0("all_estimates_", model_names[[model_n]], ".csv")), 
   row.names=FALSE
 )
 
@@ -272,4 +269,3 @@ save(data.r2jags, file = file.path(output_folder, paste0("data_r2jags_", model_n
 
 print("...finished running")
 toc()
-
