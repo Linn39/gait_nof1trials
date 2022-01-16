@@ -7,6 +7,7 @@ library(lattice)
 library(knitr)
 library(dplyr) 
 library(tidyr)
+library(doParallel)
 # library(kableExtra)
 # for nice display of inline code 
 opts_chunk$set(echo=TRUE, comment='') 
@@ -86,9 +87,9 @@ IMU_loc <- list('LFRF_windowed')  # LFRF_windowed, LF, RF
 kw <- IMU_loc[[1]]  # safety measure, for now we only load one location at a time
 
 sub_list <- list(  # for n-of-1 trials, select only one subject!
-  # "sub_01"
-  # "sub_02"
-  "sub_03"
+  "sub_01",
+  "sub_02"
+  # "sub_03"
   # "sub_05",
   # "sub_06",
   # "sub_07",
@@ -133,10 +134,10 @@ loc_df$condition[loc_df$condition == "dt"] <- 1
 
 # select list of features
 features_list <- c(
-  'stride_lengths_avg'
+  'stride_lengths_avg',
   # 'clearances_min_avg', 
   # 'clearances_max_avg',
-  # 'stride_times_avg',
+  'stride_times_avg'
   # 'swing_times_avg',
   # 'stance_times_avg',
   # 'stance_ratios_avg', 
@@ -192,12 +193,12 @@ run_jags <- function(df, model_file) {
   # Define the nodes (parameters and derivatives) to monitor and the chain parameters.
   params <- c("beta", "sigma", "phi")
   nChains = 2
-  burnInSteps = 5000
+  burnInSteps = 5
   thinSteps = 1
-  numSavedSteps = 10000  #across all chains
+  numSavedSteps = 10  #across all chains
   nIter = ceiling(burnInSteps + (numSavedSteps * thinSteps)/nChains)
   
-  data.r2jags <- jags.parallel(
+  data.r2jags <- jags(
     data = data.list, 
     inits = NULL, 
     parameters.to.save = params,
@@ -229,12 +230,16 @@ get_jags_table <- function(jags_data, sub, var) {
   return(jags_df)
 }
 
-
 # loop through all subjects and all features
+output_folder <- file.path("data", "processed", "jags_output_test")
+dir.create(output_folder, showWarnings = FALSE)
+
+registerDoParallel(cores = 4)
+
 all_estimate_df <- data.frame()
-for (subject in sub_list) {
-  print(subject)
-  for (feature in features_list) {
+all_estimated_df_list <- foreach (subject = sub_list) %:% 
+  foreach (feature = features_list) %dopar% {
+    print(subject)
     print(feature)
     # filter the dataframe
     dat_df <- filter(loc_df, sub == subject)
@@ -248,14 +253,22 @@ for (subject in sub_list) {
     # run jags
     # run_jags.options(silent.jags=TRUE, silent.runjags=TRUE)
     data.r2jags <- run_jags(dat_df, file.path("likelihood_models", likelihood_models[[model_n]]))
+    # save simulation outputs
+    save(data.r2jags, file = file.path(output_folder, paste0(
+      "data_r2jags_", 
+      model_names[[model_n]],
+      "_",
+      feature,
+      "_",
+      subject,
+      ".RData"
+      )))
     
-    # save jags data
-    all_estimate_df <- bind_rows(all_estimate_df, get_jags_table(data.r2jags, subject, feature))
+    # # save jags output table
+    # all_estimate_df <- bind_rows(all_estimate_df, get_jags_table(data.r2jags, subject, feature))
+    get_jags_table(data.r2jags, subject, feature)
   }
-}
-
-output_folder <- file.path("data", "processed", "jags_output")
-dir.create(output_folder, showWarnings = FALSE)
+all_estimate_df <- bind_rows(all_estimated_df_list)
 
 # save estimated parameters table
 write.csv(
@@ -263,9 +276,6 @@ write.csv(
   file = file.path(output_folder, paste0("all_estimates_", model_names[[model_n]], ".csv")), 
   row.names=FALSE
 )
-
-# save simulation outputs
-save(data.r2jags, file = file.path(output_folder, paste0("data_r2jags_", model_names[[model_n]], ".RData")))
 
 print("...finished running")
 toc()
