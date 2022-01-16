@@ -190,11 +190,11 @@ run_jags <- function(df, model_file) {
   data.list <- with(df, list(y = y, X = X, n = nrow(df), ngroups = ncol(X)))
   
   # Define the nodes (parameters and derivatives) to monitor and the chain parameters.
-  params <- c("beta", "sigma")
+  params <- c("beta", "sigma", "phi")
   nChains = 2
-  burnInSteps = 3000
+  burnInSteps = 5000
   thinSteps = 1
-  numSavedSteps = 15000  #across all chains
+  numSavedSteps = 10000  #across all chains
   nIter = ceiling(burnInSteps + (numSavedSteps * thinSteps)/nChains)
   
   data.r2jags <- jags.parallel(
