@@ -87,8 +87,8 @@ IMU_loc <- list('LFRF_windowed')  # LFRF_windowed, LF, RF
 kw <- IMU_loc[[1]]  # safety measure, for now we only load one location at a time
 
 sub_list <- list(  # for n-of-1 trials, select only one subject!
-  "sub_01",
-  "sub_02"
+  "sub_01"
+  # "sub_02"
   # "sub_03"
   # "sub_05",
   # "sub_06",
@@ -134,10 +134,10 @@ loc_df$condition[loc_df$condition == "dt"] <- 1
 
 # select list of features
 features_list <- c(
-  'stride_lengths_avg',
+  'stride_lengths_avg'
   # 'clearances_min_avg', 
   # 'clearances_max_avg',
-  'stride_times_avg'
+  # 'stride_times_avg'
   # 'swing_times_avg',
   # 'stance_times_avg',
   # 'stance_ratios_avg', 
@@ -185,6 +185,8 @@ append_time <- function(X) {
 }
 
 run_jags <- function(df, model_file) {
+  print("sample size:")
+  print(nrow(df))
   # Arrange the data as a list (as required by JAGS)
   X <- model.matrix(~condition * fatigue, df)   # X is the design matrix, including intercept
   # X <- append_time(X)  # append the time column to X, apply this only when considering time as covariate
@@ -193,9 +195,9 @@ run_jags <- function(df, model_file) {
   # Define the nodes (parameters and derivatives) to monitor and the chain parameters.
   params <- c("beta", "sigma", "phi")
   nChains = 2
-  burnInSteps = 5
+  burnInSteps = 3000
   thinSteps = 1
-  numSavedSteps = 10  #across all chains
+  numSavedSteps = 15000  #across all chains
   nIter = ceiling(burnInSteps + (numSavedSteps * thinSteps)/nChains)
   
   data.r2jags <- jags(

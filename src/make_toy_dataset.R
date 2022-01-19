@@ -23,7 +23,7 @@ e <- t(Cv) %*% rnorm(n, 0, sigma)  # cov(e) = V * sig^2
 ## generate response
 y <- a + b * x + e
 data.temporalCor = data.frame(y = y, x = x, year = year)
-write.table(data.temporalCor, file = "data.temporalCor.csv", 
+write.table(data.temporalCor, file = "src/data.temporalCor.csv", 
                         sep = ",", quote = F, row.names = FALSE) 
 pairs(data.temporalCor)
 
@@ -33,7 +33,7 @@ library(R2jags)
 source("src/jags_functions.R")  # import costum functions
 
 # select a model
-model_n <- 4
+model_n <- 3
 
 likelihood_models <- list(
   "fact_anovaModel_default.txt",
