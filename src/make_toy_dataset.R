@@ -1,4 +1,4 @@
-# toy dataset
+# create toy dataset
 set.seed(126)
 n = 50
 a <- 20  #intercept
@@ -26,3 +26,38 @@ data.temporalCor = data.frame(y = y, x = x, year = year)
 write.table(data.temporalCor, file = "data.temporalCor.csv", 
                         sep = ",", quote = F, row.names = FALSE) 
 pairs(data.temporalCor)
+
+
+# run JAGS
+library(R2jags)
+source("src/jags_functions.R")  # import costum functions
+
+# select a model
+model_n <- 4
+
+likelihood_models <- list(
+  "fact_anovaModel_default.txt",
+  "mixed_model_lagged_res.txt",
+  "mixed_model_AR1.txt",
+  "mixed_model_CS.txt"
+)
+
+model_names <- list(
+  "default",
+  "lagged_res",
+  "AR1",
+  "CS"
+)
+print(likelihood_models[[model_n]])
+
+tic("start running")
+print("start running...")
+
+data.r2jags <- run_jags(data.temporalCor, file.path("likelihood_models", likelihood_models[[model_n]]))
+
+print("...finished running")
+toc()
+
+
+
+
