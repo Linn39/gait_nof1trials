@@ -1,6 +1,9 @@
+library(nlme)
+library(tictoc)
+
 # create toy dataset
 set.seed(126)
-n = 50
+n = 5000
 a <- 20  #intercept
 b <- 0.2  #slope
 x <- round(runif(n, 1, n), 1)  #values of the year covariate
@@ -8,7 +11,6 @@ year <- 1:n
 sigma <- 20
 rho <- 0.8
 
-library(nlme)
 ## define a constructor for a first-order
 ## correlation structure
 ar1 <- corAR1(form = ~year, value = rho)
@@ -36,10 +38,12 @@ source("src/jags_functions.R")  # import costum functions
 model_n <- 3
 
 likelihood_models <- list(
-  "fact_anovaModel_default.txt",
-  "mixed_model_lagged_res.txt",
-  "mixed_model_AR1.txt",
-  "mixed_model_CS.txt"
+  "fact_anovaModel_default.txt",      #1 
+  "new_fact_anovaModel_default.txt",  #2
+  "mixed_model_lagged_res.txt",       #3
+  "mixed_model_AR1.txt",              #4
+  "new_mixed_model_AR1.txt",          #5
+  "mixed_model_CS.txt"                #6
 )
 
 model_names <- list(
@@ -49,6 +53,21 @@ model_names <- list(
   "CS"
 )
 print(likelihood_models[[model_n]])
+
+run_jags_tictoc <- function(data, model_number, text){
+  
+  tic(sprintf("start running %s", text))
+  print(sprintf("start running %s...", text))
+  
+  data.r2jags <- run_jags(data, file.path("likelihood_models", likelihood_models[[model_number]]))
+  
+  print(sprintf("...finished running %s", text))
+  toc()
+  return(data.r2jags)
+}
+
+jags_old_ar1 <- run_jags_tictoc(data.temporalCor, 1, "AR1 old")
+jags_new_ar1 <- run_jags_tictoc(data.temporalCor, 2, "AR1 old")
 
 tic("start running")
 print("start running...")
