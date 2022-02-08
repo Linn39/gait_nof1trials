@@ -1,0 +1,52 @@
+---
+title: "MCMC Diagnostics"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+https://agabrioblog.onrender.com/jags/simple-linear-regression-jags/simple-linear-regression-jags/
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+```{r}
+library(mcmcplots)
+library(coda)
+
+# import r2jags data
+data.r2jags <- get(load(file.path("..", "data", "processed", "jags_output", "data_r2jags_AR1_sub02.RData")))
+```
+
+Print posterior estimates
+```{r}
+print(data.r2jags$BUGSoutput$summary)
+```
+
+
+```{r}
+# density plot
+denplot(data.r2jags, parms = c("beta", "sigma", "phi"))
+```
+```{r}
+# trace plot
+traplot(data.r2jags, parms = c("beta", "sigma", "phi"))
+```
+Raftery diagnostics: require no more than N samples to reach the specified level of confidence in convergence
+```{r}
+data.mcmc = as.mcmc(data.r2jags)
+
+# raftery diagnostics
+raftery.diag(data.mcmc)
+```
+Autocorrelation plot for each parameter illustrate the degree of correlation between MCMC samples separated by different lags. For example, a lag of 0 represents the degree of correlation between each MCMC sample and itself (obviously this will be a correlation of 1). A lag of 1 represents the degree of correlation between each MCMC sample and the next sample along the chain and so on. In order to be able to generate unbiased estimates of parameters, the MCMC samples should be independent (uncorrelated).
+```{r}
+#Autocorrelation diagnostic
+autocorr.diag(data.mcmc)
+```
+
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
