@@ -1,3 +1,5 @@
+library(dplyr)
+
 #### load gait data
 load_gait_parameters <- function (folder_path, keyword, subject, test, cond) {
   
@@ -51,3 +53,11 @@ downsample_rows <- function (df, step) {
   new_df <- df[seq(1, nrow(df), step), ]
   return(new_df)
 }
+
+summary_mean <- function (df) {
+  means_df <- df %>%
+    group_by(sub, fatigue, condition) %>% 
+    summarise_each(funs(mean))
+  return(means_df)
+}
+
