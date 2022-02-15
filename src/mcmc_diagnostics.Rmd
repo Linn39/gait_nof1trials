@@ -14,6 +14,7 @@ library(coda)
 
 # import r2jags data
 data.r2jags <- get(load(file.path("..", "data", "processed", "jags_output", "data_r2jags_AR1_sub02.RData")))
+# data.r2jags <- get(load(file.path("..", "data", "processed", "jags_output_test", "data_r2jags_AR1_stride_lengths_avg_sub_02.RData")))
 ```
 
 Print posterior estimates
@@ -37,7 +38,7 @@ data.mcmc = as.mcmc(data.r2jags)
 # raftery diagnostics
 raftery.diag(data.mcmc)
 ```
-Autocorrelation plot for each parameter illustrate the degree of correlation between MCMC samples separated by different lags. For example, a lag of 0 represents the degree of correlation between each MCMC sample and itself (obviously this will be a correlation of 1). A lag of 1 represents the degree of correlation between each MCMC sample and the next sample along the chain and so on. In order to be able to generate unbiased estimates of parameters, the MCMC samples should be independent (uncorrelated).
+Autocorrelation for each parameter illustrate the degree of correlation between MCMC samples separated by different lags. For example, a lag of 0 represents the degree of correlation between each MCMC sample and itself (obviously this will be a correlation of 1). A lag of 1 represents the degree of correlation between each MCMC sample and the next sample along the chain and so on. In order to be able to generate unbiased estimates of parameters, the MCMC samples should be independent (uncorrelated).
 ```{r}
 #Autocorrelation diagnostic
 autocorr.diag(data.mcmc)
