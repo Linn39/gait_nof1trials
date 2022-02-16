@@ -14,8 +14,12 @@ library(coda)
 print(getwd())
 
 # import r2jags data
-analysis <- "jags_output_downsample_10"
-data.r2jags <- get(load(file.path("..", "data", "processed", analysis, "data_r2jags_AR1_stride_lengths_sub_01.RData")))
+n <- 2
+analyses <- list(
+  "jags_output",  # the standard model
+  "jags_output_downsample_10"  # with downsampled stride-by-stride data
+  )
+data.r2jags <- get(load(file.path("..", "data", "processed", analyses[[n]], "data_r2jags_AR1_stride_lengths_sub_02.RData")))   # 
 ```
 
 Print posterior estimates
@@ -33,6 +37,7 @@ denplot(data.r2jags, parms = c("beta", "sigma", "phi"))
 traplot(data.r2jags, parms = c("beta", "sigma", "phi"))
 ```
 Raftery diagnostics: require no more than N samples to reach the specified level of confidence in convergence
+https://rdrr.io/cran/coda/man/raftery.diag.html
 ```{r}
 data.mcmc = as.mcmc(data.r2jags)
 
