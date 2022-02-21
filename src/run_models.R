@@ -1,3 +1,8 @@
+print(getwd())
+setwd("/dhc/home/lin.zhou/projects/gait_jags")
+print(getwd())
+.libPaths("/dhc/home/lin.zhou/projects/gait_jags/renv/library/R-4.1/x86_64-pc-linux-gnu")
+print(.libPaths())
 rm(list = ls())
 
 library(tictoc)
@@ -7,11 +12,12 @@ library(lattice)
 library(knitr)
 library(dplyr) 
 library(tidyr)
+library(foreach)
 library(doParallel)
 # library(kableExtra)
-print(getwd())
-source("src/data_loader.R")
-source("src/jags_functions.R")
+
+source("./src/data_loader.R")
+source("./src/jags_functions.R")
 
 # for nice display of inline code 
 opts_chunk$set(echo=TRUE, comment='') 
@@ -23,7 +29,7 @@ print("start running...")
 #### choose a model
 
 model_n <- 3
-downsample_step <- 10
+downsample_step <- 50
 
 likelihood_models <- list(
   "fact_anovaModel_default.txt",
@@ -48,11 +54,11 @@ IMU_loc <- list('LFRF_all_strides')  # LFRF_windowed, LF, RF, LFRF_all_strides
 kw <- IMU_loc[[1]]  # safety measure, for now we only load one location at a time
 
 sub_list <- list(  # for n-of-1 trials, select only one subject!
-  "sub_01",
-  "sub_02",
-  "sub_03",
-  "sub_05",
-  "sub_06"
+  # "sub_01"
+  # "sub_02"
+  # "sub_03"
+  "sub_05"
+  # "sub_06"
   # "sub_07",
   # "sub_08",
   # "sub_09",
@@ -68,8 +74,10 @@ sub_list <- list(  # for n-of-1 trials, select only one subject!
 
 # read data from file
 loc_df <- load_gait_parameters(folder_path, kw,  sub, test, cond)
+loc_df <- loc_df[loc_df$foot == "left", ]
 loc_df <- downsample_rows(loc_df[loc_df$foot == "left", ], downsample_step) # reduce data size
-print(nrow(loc_df))
+print(paste("Downsample by", downsample_step))
+print(paste("Dataset total sample size:", nrow(loc_df)))
 
 # rename the label columns to 1 and 0
 loc_df$fatigue[loc_df$fatigue == "control"] <- 0
@@ -109,10 +117,10 @@ features_list <- c(
 )
 
 # loop through all subjects and all features
-output_folder <- file.path("data", "processed", paste0("jags_output_downsample_", as.character(downsample_step)))
+output_folder <- file.path("data", "processed", paste0("jags_output_left_foot_downsample_", as.character(downsample_step)))
 dir.create(output_folder, showWarnings = FALSE)
 
-# registerDoParallel(cores = 4)
+# registerDoParallel(cores = 5)
 # 
 all_estimate_df <- data.frame()
 # all_estimated_df_list <- foreach (subject = sub_list) %:% 
@@ -125,6 +133,7 @@ for (subject in sub_list) {
     dat_df <- filter(loc_df, sub == subject)
     dat_df <- dat_df[, c(feature, "fatigue", "condition")]
     dat_df <- rename(dat_df,c('y' = feature))
+    print(paste("Current sample size:", nrow(dat_df)))
     
     # # viasualizing the data (optional)
     # with(dat_df, interaction.plot(fatigue, condition, y, main=paste(subject, feature)))
@@ -146,8 +155,10 @@ for (subject in sub_list) {
       )))
     
     # # save jags output table
-    all_estimate_df <- bind_rows(all_estimate_df, get_jags_table(data.r2jags, subject, feature))
-    get_jags_table(data.r2jags, subject, feature)
+    # all_estimate_df <- get_jags_table(data.r2jags, subject, feature)  # use this line when running parallel with foreach
+    # all_estimate_df
+    # all_estimate_df <- bind_rows(all_estimate_df, get_jags_table(data.r2jags, subject, feature))
+    # get_jags_table(data.r2jags, subject, feature)
   }
 }
 # all_estimate_df <- bind_rows(all_estimated_df_list)
