@@ -11,3 +11,9 @@
 
 # exclude reference documents for the project 
 /references/
+
+*.pdf
+*.rds
+*.txt
+*.png
+*.zip
