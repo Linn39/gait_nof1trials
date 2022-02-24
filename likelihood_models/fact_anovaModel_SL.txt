@@ -1,0 +1,15 @@
+
+  model {
+  #Likelihood
+  for (i in 1:n) {
+  y[i]~dnorm(mean[i],tau)
+  mean[i] <- inprod(beta[],X[i,])
+  }
+  #Priors
+  for (i in 1:ngroups) {
+  beta[i] ~ dnorm(1.4, 0.04)
+  }
+  sigma ~ dunif(0, 100)
+  tau <- 1 / (sigma * sigma)
+  }
+

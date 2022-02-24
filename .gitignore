@@ -1,0 +1,19 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+
+# exclude Mac system files
+.DS_Store
+
+# exclude data from source control by default
+/data/
+
+# exclude reference documents for the project 
+/references/
+
+*.pdf
+*.rds
+*.txt
+*.png
+*.zip
