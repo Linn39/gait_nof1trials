@@ -9,6 +9,13 @@
     ]
   },
   "Packages": {
+    "GGally": {
+      "Package": "GGally",
+      "Version": "2.1.2",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "022f78c8698724b326f1838b1a98cafa"
+    },
     "MASS": {
       "Package": "MASS",
       "Version": "7.3-54",
@@ -72,6 +79,20 @@
       "Repository": "CRAN",
       "Hash": "e8a22846fff485f0be3770c2da758713"
     },
+    "assertthat": {
+      "Package": "assertthat",
+      "Version": "0.2.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "50c838a310445e954bc13f26f26a6ecf"
+    },
+    "backports": {
+      "Package": "backports",
+      "Version": "1.3.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "194ad71f8ed59393272a0c4be2eac215"
+    },
     "base64enc": {
       "Package": "base64enc",
       "Version": "0.1-3",
@@ -99,6 +120,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "0baa960e3b49c6176a4f42addcbacc59"
+    },
+    "checkmate": {
+      "Package": "checkmate",
+      "Version": "2.0.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "a667800d5f0350371bedeb8b8b950289"
     },
     "cli": {
       "Package": "cli",
@@ -233,6 +261,20 @@
       "Repository": "CRAN",
       "Hash": "77bd60a6157420d4ffa93b27cf6a58b8"
     },
+    "fastmatch": {
+      "Package": "fastmatch",
+      "Version": "1.1-3",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "dabc225759a2c2b241e60e42bf0e8e54"
+    },
+    "forcats": {
+      "Package": "forcats",
+      "Version": "0.5.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "81c3244cab67468aac4c60550832655d"
+    },
     "foreach": {
       "Package": "foreach",
       "Version": "1.5.1",
@@ -246,6 +288,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "4d243a9c10b00589889fe32314ffd902"
+    },
+    "ggmcmc": {
+      "Package": "ggmcmc",
+      "Version": "1.5.1.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "50f1ceaa14bb8d8d8f2879f55e14ea42"
     },
     "ggplot2": {
       "Package": "ggplot2",
@@ -302,6 +351,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "a525aba14184fec243f9eaec62fbed43"
+    },
+    "install.load": {
+      "Package": "install.load",
+      "Version": "1.2.3",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "2b6ea7fde6f1d31521eeb534254219ba"
     },
     "isoband": {
       "Package": "isoband",
@@ -443,6 +499,13 @@
       "Repository": "CRAN",
       "Hash": "fbb11e44d057996ca5fe40d959cacfb0"
     },
+    "plyr": {
+      "Package": "plyr",
+      "Version": "1.8.6",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "ec0e5ab4e5f851f6ef32cd1d1984957f"
+    },
     "prettyunits": {
       "Package": "prettyunits",
       "Version": "1.1.1",
@@ -484,6 +547,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "30e5eba91b67f7f4d75d31de14bbfbdc"
+    },
+    "reshape": {
+      "Package": "reshape",
+      "Version": "0.8.8",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "0f4d941129e00ed34a7d192b1da7ccef"
     },
     "rjags": {
       "Package": "rjags",
