@@ -17,9 +17,9 @@ print(getwd())
 n <- 2
 analyses <- list(
   "jags_output",  # the standard model
-  "jags_output_downsample_10"  # with downsampled stride-by-stride data
+  "jags_output_left_foot_downsample_2"  # with downsampled stride-by-stride data
   )
-data.r2jags <- get(load(file.path("..", "data", "processed", analyses[[n]], "data_r2jags_AR1_stride_lengths_sub_02.RData")))   # 
+data.r2jags <- get(load(file.path("..", "data", "processed", analyses[[n]], "data_r2jags_AR1_stride_lengths_sub_05.RData")))   # 
 ```
 
 Print posterior estimates
@@ -36,7 +36,19 @@ denplot(data.r2jags, parms = c("beta", "sigma", "phi"))
 # trace plot
 traplot(data.r2jags, parms = c("beta", "sigma", "phi"))
 ```
+Running plots
+Running plots show each posterior draw per iteration by variable for each chain. The dark line in this plot indicates the posterior mean for that chain. We want these means to be as equal as possible, or make sure that the chains are exploring the same area. For both chains, we also want to see the draws from the posterior distribution stay as close as possible to the posterior mean. If the observations bounce around too much, it is an indication that the posterior has not reached a stationary distribution.
+https://static1.squarespace.com/static/610c1467ea1d4a02e9c1a010/t/610c3e967c967e2ab20086d6/1628192407632/BayesLabDay3.pdf
+```{r}
+library(ggmcmc)
+data.gg<-ggs(as.mcmc(data.r2jags))
+ggs_running(data.gg)
+# ggs_traceplot(data.gg)
+```
+
+
 Raftery diagnostics: require no more than N samples to reach the specified level of confidence in convergence
+You can interpret this test by looking at the feasibility of convergence. Generally speaking, you want for the total number of needed iterations to be less than 100,000. Any more than 100,000 gives cause for concern.
 https://rdrr.io/cran/coda/man/raftery.diag.html
 ```{r}
 data.mcmc = as.mcmc(data.r2jags)
@@ -44,6 +56,15 @@ data.mcmc = as.mcmc(data.r2jags)
 # raftery diagnostics
 raftery.diag(data.mcmc)
 ```
+Geweke Test
+The Geweke Test compares the posterior mean of the first half of a Markov chain to the second half. Under this test, the null hypothesis that the model has achieved convergence. Therefore, we do not want to reject the null hypothesis. The following code demonstrates how to conduct the Geweke test on your Bayesian model. The Geweke test also comes with a plot version of the results.
+https://static1.squarespace.com/static/610c1467ea1d4a02e9c1a010/t/610c3e967c967e2ab20086d6/1628192407632/BayesLabDay3.pdf
+```{r}
+geweke.diag(data.mcmc)
+geweke.plot(data.mcmc)
+```
+
+
 Autocorrelation for each parameter illustrate the degree of correlation between MCMC samples separated by different lags. For example, a lag of 0 represents the degree of correlation between each MCMC sample and itself (obviously this will be a correlation of 1). A lag of 1 represents the degree of correlation between each MCMC sample and the next sample along the chain and so on. In order to be able to generate unbiased estimates of parameters, the MCMC samples should be independent (uncorrelated).
 ```{r}
 #Autocorrelation diagnostic

@@ -3,7 +3,9 @@ install.load::install_load("mcmcplots", "coda", "R2jags")
 # import r2jags data
 
 data.r2jags <- get(load(file.path("data", "processed", "jags_output", "data_r2jags_AR1.RData")))
+data.r2jags <- get(load(file.path("data", "processed", "jags_output_left_foot_downsample_1", "data_r2jags_AR1_stride_lengths_sub_03.RData")))
 
+data.r2jags.large <- data.r2jags
 data.mcmc = as.mcmc(data.r2jags)
 
 
