@@ -53,7 +53,7 @@ modelString = "
   e[1] <- (y[1] - fit[1])
   mu[1] <- fit[1]
   for (i in 2:n) {
-  e[i] <- (y[i] - fit[i]) - phi*e[i-1]
+  e[i] <- (y[i] - fit[i]) #- phi*e[i-1]
   mu[i] <- fit[i] + phi * e[i-1]
   }
   #Priors
@@ -81,6 +81,7 @@ model {
   z ~ dnorm(0, 0.04)I(0,)
   tau <- pow(sigma, -2)
   tau.cor <- tau #* (1- phi*phi)
+
   #Likelihood
   for (i in 1:n) {
     y[i] ~ dnorm(mu[i],tau.cor)
@@ -89,7 +90,7 @@ model {
   e[1] <- (y[1] - fit[1])
   mu[1] <- fit[1]
   for (i in 2:n) {
-    e[i] <- (y[i] - fit[i]) - phi*e[i-1]
+    e[i] <- (y[i] - fit[i]) #- phi*e[i-1]
     mu[i] <- fit[i] + phi * e[i-1]
   }
  
@@ -97,6 +98,7 @@ model {
 "
 # write the model to a text file
 writeLines(modelString, con = file.path("likelihood_models", "mixed_model_lagged_res.txt"))
+writeLines(modelString_new, con = file.path("likelihood_models", "mixed_model_lagged_res_new.txt"))
 
 
 #### model incorporating first order autoregressive (AR1) residual autocorrelation structure
@@ -105,7 +107,7 @@ modelString = "
 model {
 #Likelihood
 for (i in 1:n) {
-mu[i] <- inprod(beta[i],X[i,])
+mu[i] <- inprod(beta[],X[i,])
 }
 y[1:n] ~ dmnorm(mu[1:n],Omega)
 for (i in 1:n) {
