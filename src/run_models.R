@@ -28,19 +28,23 @@ print("start running...")
 
 #### choose a model
 
-model_n <- 3
-downsample_step <- 50
+model_n <- 4
+downsample_step <- 1
 
 likelihood_models <- list(
   "fact_anovaModel_default.txt",
+  "fact_anovaModel_default_time_cov.txt",
   "mixed_model_lagged_res.txt",
+  "mixed_model_lagged_res_new.txt",  # swap model difinition and priors
   "mixed_model_AR1.txt",
   "mixed_model_CS.txt"
 )
 
 model_names <- list(
   "default",
+  "default_time_cov",
   "lagged_res",
+  "lagged_res_new",
   "AR1",
   "CS"
 )
@@ -55,21 +59,21 @@ kw <- IMU_loc[[1]]  # safety measure, for now we only load one location at a tim
 
 sub_list <- list(  # for n-of-1 trials, select only one subject!
   # "sub_01"
-  # "sub_02"
-  # "sub_03"
-  "sub_05"
-  # "sub_06"
-  # "sub_07",
-  # "sub_08",
-  # "sub_09",
-  # "sub_10",
-  # "sub_11",
-  # "sub_12",
-  # "sub_13",
-  # "sub_14",
-  # "sub_15",
-  # "sub_17",
-  # "sub_18"
+  "sub_02",
+  "sub_03",
+  "sub_05",
+  "sub_06",
+  "sub_07",
+  "sub_08",
+  "sub_09",
+  "sub_10",
+  "sub_11",
+  "sub_12",
+  "sub_13",
+  "sub_14",
+  "sub_15",
+  "sub_17",
+  "sub_18"
   )
 
 # read data from file
@@ -87,10 +91,10 @@ loc_df$condition[loc_df$condition == "dt"] <- 1
 
 # select list of features
 features_list <- c(
-  'stride_lengths'
+  'stride_lengths',
   # 'clearances_min_avg', 
   # 'clearances_max_avg',
-  # 'stride_times_avg'
+  'stride_times'
   # 'swing_times_avg',
   # 'stance_times_avg',
   # 'stance_ratios_avg', 
