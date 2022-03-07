@@ -1,4 +1,4 @@
- 
+
   model {
   #Likelihood
   for (i in 1:n) {
@@ -8,7 +8,7 @@
   e[1] <- (y[1] - fit[1])
   mu[1] <- fit[1]
   for (i in 2:n) {
-  e[i] <- (y[i] - fit[i]) - phi*e[i-1]
+  e[i] <- (y[i] - fit[i]) #- phi*e[i-1]
   mu[i] <- fit[i] + phi * e[i-1]
   }
   #Priors
