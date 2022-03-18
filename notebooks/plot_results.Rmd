@@ -1,0 +1,98 @@
+---
+title: "plot results"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+# import posterior estimations
+```{r} 
+# rm(list=ls()) 
+
+library(dplyr) 
+library(ggplot2)
+source("../src/jags_functions.R")
+
+#### choose a model
+
+model_n <- 5
+
+likelihood_models <- list(
+  "fact_anovaModel_default.txt",
+  "fact_anovaModel_default_time_cov.txt",
+  "mixed_model_lagged_res.txt",
+  "mixed_model_lagged_res_new.txt",  # swap model difinition and priors
+  "mixed_model_AR1.txt",
+  "mixed_model_CS.txt"
+)
+
+model_names <- list(
+  "default",
+  "default_time_cov",
+  "lagged_res",
+  "lagged_res_new",
+  "AR1",
+  "CS"
+)
+
+sub_list <- list(  # for n-of-1 trials, select only one subject!
+  "sub_01",
+  "sub_02",
+  "sub_03",
+  "sub_05",
+  "sub_06",
+  "sub_07",
+  "sub_08",
+  "sub_09",
+  "sub_10",
+  "sub_11",
+  "sub_12",
+  "sub_13",
+  "sub_14",
+  "sub_15",
+  "sub_17",
+  "sub_18"
+  )
+
+print(likelihood_models[[model_n]])
+
+# read posterior estimations from file
+if (model_names[model_n] == "AR1") {
+  downsample_n <- 5
+} else {
+  downsample_n <- 1
+}
+
+read_path <- file.path("..", "data", "processed", paste0("jags_output_left_foot_downsample_", downsample_n))
+
+# collect estimates for all subjects
+all_estimate_df <- data.frame()
+for (gait_param in c("stride_lengths", "stride_times")) {
+  for (sub in sub_list) {
+  file_name <- paste0("data_r2jags_", model_names[model_n], "_", gait_param, "_", sub, ".RData")
+  load(file.path(read_path, file_name))
+  all_estimate_df <- bind_rows(all_estimate_df, get_jags_table(data.r2jags, sub, gait_param))
+  }
+}
+
+
+```
+```{r}
+# plot mean values
+title <- "beta[1]"
+mean_df <- filter(all_estimate_df, parameter == "beta[1]" & var == "stride_lengths")
+p <- ggplot(mean_df,aes(x=sub)) + 
+  geom_boxplot(aes(lower=mean-sd,upper=mean+sd,middle=mean,ymin=mean-3*sd,ymax=mean+3*sd),stat="identity")
+p <- p + labs(title=title)
+print(p)
+```
+
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+

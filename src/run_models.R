@@ -1,8 +1,8 @@
-print(getwd())
-setwd("/dhc/home/lin.zhou/projects/gait_jags")
-print(getwd())
-.libPaths("/dhc/home/lin.zhou/projects/gait_jags/renv/library/R-4.1/x86_64-pc-linux-gnu")
-print(.libPaths())
+# print(getwd())
+# setwd("/dhc/home/lin.zhou/projects/gait_jags")
+# print(getwd())
+# .libPaths("/dhc/home/lin.zhou/projects/gait_jags/renv/library/R-4.1/x86_64-pc-linux-gnu")
+# print(.libPaths())
 rm(list = ls())
 
 library(tictoc)
