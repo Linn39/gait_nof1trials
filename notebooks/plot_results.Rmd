@@ -9,10 +9,11 @@ Try executing this chunk by clicking the *Run* button within the chunk or by pla
 
 # import posterior estimations
 ```{r} 
-# rm(list=ls()) 
+rm(list=ls())
 
 library(dplyr) 
 library(ggplot2)
+library(tidyverse)
 source("../src/jags_functions.R")
 
 #### choose a model
@@ -88,6 +89,51 @@ p <- ggplot(mean_df,aes(x=sub)) +
 p <- p + labs(title=title)
 print(p)
 ```
+Get distributions of all 4 conditions
+```{r}
+beta1 <- filter(all_estimate_df, parameter == "beta[1]")
+beta2 <- filter(all_estimate_df, parameter == "beta[2]")
+beta3 <- filter(all_estimate_df, parameter == "beta[3]")
+beta4 <- filter(all_estimate_df, parameter == "beta[4]")
+
+conditions_df <- beta1[, c("sub", "var")]
+# conditions_df <- beta1["sub"]
+
+for (value in c("mean", "sd")) {
+  if (value == "mean") {
+    conditions_df["st_control"] <- beta1[value]
+    conditions_df["st_fatigue"] <- beta1[value] + beta3[value]
+    conditions_df["dt_control"] <- beta1[value] + beta2[value]
+    conditions_df["dt_fatigue"] <- beta1[value] + beta2[value] + beta3[value] + beta4[value]
+    conditions_df_mean <- gather(conditions_df, key = "condition", value = "mean",
+                              st_control, st_fatigue, dt_control, dt_fatigue)
+  } else if (value == "sd") {
+    conditions_df["st_control"] <- sqrt(beta1[value]^2)
+    conditions_df["st_fatigue"] <- sqrt(beta1[value]^2 + beta3[value]^2)
+    conditions_df["dt_control"] <- sqrt(beta1[value]^2 + beta2[value]^2)
+    conditions_df["dt_fatigue"] <- sqrt(beta1[value]^2 + beta2[value]^2 + beta3[value]^2 + beta4[value]^2)
+    conditions_df_sd <- gather(conditions_df, key = "condition", value = "sd",
+                              st_control, st_fatigue, dt_control, dt_fatigue)
+    }
+}
+plot_df <- merge(conditions_df_mean, conditions_df_sd)
+
+```
+
+```{r}
+param <- "stride_times"
+plot_df <- filter(plot_df, var == param)
+p <- ggplot(plot_df, aes(x = sub, color = condition)) +
+  geom_boxplot(aes(ymin =mean-3*sd, lower = mean-sd,
+                   middle = mean, upper = mean+sd,
+                   ymax = mean+3*sd),
+               stat = "identity")
+p <- p + labs(title=param)
+par(las=2)
+print(p)
+```
+
+
 
 
 Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
