@@ -99,31 +99,44 @@ beta4 <- filter(all_estimate_df, parameter == "beta[4]")
 conditions_df <- beta1[, c("sub", "var")]
 # conditions_df <- beta1["sub"]
 
-for (value in c("mean", "sd")) {
-  if (value == "mean") {
-    conditions_df["st_control"] <- beta1[value]
-    conditions_df["st_fatigue"] <- beta1[value] + beta3[value]
-    conditions_df["dt_control"] <- beta1[value] + beta2[value]
-    conditions_df["dt_fatigue"] <- beta1[value] + beta2[value] + beta3[value] + beta4[value]
-    conditions_df_mean <- gather(conditions_df, key = "condition", value = "mean",
-                              st_control, st_fatigue, dt_control, dt_fatigue)
-  } else if (value == "sd") {
-    conditions_df["st_control"] <- sqrt(beta1[value]^2)
-    conditions_df["st_fatigue"] <- sqrt(beta1[value]^2 + beta3[value]^2)
-    conditions_df["dt_control"] <- sqrt(beta1[value]^2 + beta2[value]^2)
-    conditions_df["dt_fatigue"] <- sqrt(beta1[value]^2 + beta2[value]^2 + beta3[value]^2 + beta4[value]^2)
-    conditions_df_sd <- gather(conditions_df, key = "condition", value = "sd",
-                              st_control, st_fatigue, dt_control, dt_fatigue)
-    }
-}
+value <- "mean"
+conditions_df["st_control"] <- beta1[value]
+conditions_df["st_fatigue"] <- beta1[value] + beta3[value]
+conditions_df["dt_control"] <- beta1[value] + beta2[value]
+conditions_df["dt_fatigue"] <- beta1[value] + beta2[value] + beta3[value] + beta4[value]
+conditions_df_mean <- gather(conditions_df, key = "condition", value = "mean",
+                          st_control, st_fatigue, dt_control, dt_fatigue)
+
+value <- "sd"
+conditions_df["st_control"] <- sqrt(beta1[value]^2)
+conditions_df["st_fatigue"] <- sqrt(beta1[value]^2 + beta3[value]^2)
+conditions_df["dt_control"] <- sqrt(beta1[value]^2 + beta2[value]^2)
+conditions_df["dt_fatigue"] <- sqrt(beta1[value]^2 + beta2[value]^2 + beta3[value]^2 + beta4[value]^2)
+conditions_df_sd <- gather(conditions_df, key = "condition", value = "sd",
+                          st_control, st_fatigue, dt_control, dt_fatigue)
+
 plot_df <- merge(conditions_df_mean, conditions_df_sd)
+
+# add mean over all subjects
+conditions_df_mean_all <- aggregate(mean~condition+var, conditions_df_mean, mean)
+conditions_df_mean_all["sub"] <- "all"
+
+# add sd over all subjects
+# conditions_df_sd_all <- sqrt(sum(conditions_df_sd["sd"]^2))
+conditions_df_sd_all <- aggregate(sd~condition+var, conditions_df_sd, function(x) sqrt(sum(x^2)))
+conditions_df_sd_all["sub"] <- "all"
+
+conditions_df_all <- merge(conditions_df_mean_all, conditions_df_sd_all)
+
+# put all dataframes together
+plot_df <- bind_rows(plot_df, conditions_df_all)
 
 ```
 
 ```{r}
 param <- "stride_times"
-plot_df <- filter(plot_df, var == param)
-p <- ggplot(plot_df, aes(x = sub, fill = condition)) +
+plot_param_df <- filter(plot_df, var == param)
+p <- ggplot(plot_param_df, aes(x = sub, fill = condition)) +
   geom_boxplot(aes(ymin =mean-3*sd, lower = mean-sd, middle = mean, upper = mean+sd, ymax = mean+3*sd),
                stat = "identity") +
   scale_fill_brewer(palette="Spectral") +
@@ -132,6 +145,7 @@ p <- p + labs(title=param)
 par(las=2)
 print(p)
 ```
+
 
 
 
