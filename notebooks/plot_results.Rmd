@@ -134,7 +134,7 @@ plot_df <- bind_rows(plot_df, conditions_df_all)
 ```
 
 ```{r}
-param <- "stride_times"
+param <- "stride_lengths"
 plot_param_df <- filter(plot_df, var == param)
 p <- ggplot(plot_param_df, aes(x = sub, fill = condition)) +
   geom_boxplot(aes(ymin =mean-3*sd, lower = mean-sd, middle = mean, upper = mean+sd, ymax = mean+3*sd),
@@ -146,6 +146,32 @@ par(las=2)
 print(p)
 ```
 
+Summary of the real data
+```{r}
+all_strides_df <- read_csv(file.path("..", "data", "processed", "features", "df_all.csv"), show_col_types = FALSE)
+all_strides_df <- all_strides_df[all_strides_df$foot == "left", ]  # filter left foot to match the data used for JAGS models
+all_strides_df["conditions"] <- paste(all_strides_df$condition, all_strides_df$fatigue, sep="-")
+
+ggplot(all_strides_df, aes(x = sub, y=stride_times, fill = conditions)) +
+  geom_boxplot() +
+  scale_fill_brewer(palette="Spectral") +
+  theme(axis.text.x = element_text(angle = 45))
+
+```
+
+
+```{r}
+summary_df <- read_csv(file.path("..", "data", "processed", "means.csv"), show_col_types = FALSE)
+# Adding column based on other column:
+summary_df <- summary_df %>%
+  mutate(condition = case_when(
+    (fatigue == 0 & condition == 0) ~ "st_control",
+    (fatigue == 1 & condition == 0) ~ "st_fatigue",
+    (fatigue == 0 & condition == 1) ~ "dt_control",
+    (fatigue == 1 & condition == 1) ~ "dt_fatigue"
+    ))
+
+```
 
 
 
