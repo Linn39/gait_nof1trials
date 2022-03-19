@@ -123,11 +123,11 @@ plot_df <- merge(conditions_df_mean, conditions_df_sd)
 ```{r}
 param <- "stride_times"
 plot_df <- filter(plot_df, var == param)
-p <- ggplot(plot_df, aes(x = sub, color = condition)) +
-  geom_boxplot(aes(ymin =mean-3*sd, lower = mean-sd,
-                   middle = mean, upper = mean+sd,
-                   ymax = mean+3*sd),
-               stat = "identity")
+p <- ggplot(plot_df, aes(x = sub, fill = condition)) +
+  geom_boxplot(aes(ymin =mean-3*sd, lower = mean-sd, middle = mean, upper = mean+sd, ymax = mean+3*sd),
+               stat = "identity") +
+  scale_fill_brewer(palette="Spectral") +
+  theme(axis.text.x = element_text(angle = 45))
 p <- p + labs(title=param)
 par(las=2)
 print(p)
