@@ -10,6 +10,7 @@ Try executing this chunk by clicking the *Run* button within the chunk or by pla
 # import posterior estimations
 ```{r} 
 rm(list=ls())
+# knitr::opts_chunk$set(echo = TRUE, fig.width = 15, fig.height = 5)
 
 library(dplyr) 
 library(ggplot2)
@@ -80,15 +81,7 @@ for (gait_param in c("stride_lengths", "stride_times")) {
 
 
 ```
-```{r}
-# plot mean values
-title <- "beta[1]"
-mean_df <- filter(all_estimate_df, parameter == "beta[1]" & var == "stride_lengths")
-p <- ggplot(mean_df,aes(x=sub)) + 
-  geom_boxplot(aes(lower=mean-sd,upper=mean+sd,middle=mean,ymin=mean-3*sd,ymax=mean+3*sd),stat="identity")
-p <- p + labs(title=title)
-print(p)
-```
+
 Get distributions of all 4 conditions
 ```{r}
 beta1 <- filter(all_estimate_df, parameter == "beta[1]")
@@ -121,24 +114,24 @@ plot_df <- merge(conditions_df_mean, conditions_df_sd)
 conditions_df_mean_all <- aggregate(mean~condition+var, conditions_df_mean, mean)
 conditions_df_mean_all["sub"] <- "all"
 
-# add sd over all subjects
-# conditions_df_sd_all <- sqrt(sum(conditions_df_sd["sd"]^2))
-conditions_df_sd_all <- aggregate(sd~condition+var, conditions_df_sd, function(x) sqrt(sum(x^2)))
+# add sd of means over all subjects
+# conditions_df_sd_all <- aggregate(sd~condition+var, conditions_df_sd, function(x) sqrt(sum(x^2)))  # aggregate SD
+conditions_df_sd_all<- aggregate(mean~condition+var, conditions_df_mean, sd)  # SD of means
+names(conditions_df_sd_all)[names(conditions_df_sd_all) == 'mean'] <- 'sd'
 conditions_df_sd_all["sub"] <- "all"
 
 conditions_df_all <- merge(conditions_df_mean_all, conditions_df_sd_all)
-
 # put all dataframes together
 plot_df <- bind_rows(plot_df, conditions_df_all)
 
 ```
 
-```{r}
+```{r, fig.width = 8, fig.height = 3}
 param <- "stride_lengths"
 plot_param_df <- filter(plot_df, var == param)
 p <- ggplot(plot_param_df, aes(x = sub, fill = condition)) +
   geom_boxplot(aes(ymin =mean-3*sd, lower = mean-sd, middle = mean, upper = mean+sd, ymax = mean+3*sd),
-               stat = "identity") +
+               stat = "identity", width=0.6) +
   scale_fill_brewer(palette="Spectral") +
   theme(axis.text.x = element_text(angle = 45))
 p <- p + labs(title=param)
@@ -147,15 +140,18 @@ print(p)
 ```
 
 Summary of the real data
-```{r}
+```{r, fig.width = 8, fig.height = 3}
 all_strides_df <- read_csv(file.path("..", "data", "processed", "features", "df_all.csv"), show_col_types = FALSE)
 all_strides_df <- all_strides_df[all_strides_df$foot == "left", ]  # filter left foot to match the data used for JAGS models
 all_strides_df["conditions"] <- paste(all_strides_df$condition, all_strides_df$fatigue, sep="-")
 
-ggplot(all_strides_df, aes(x = sub, y=stride_times, fill = conditions)) +
-  geom_boxplot() +
+subs <- unique(all_strides_df$sub)
+p <- ggplot(all_strides_df, aes(x = sub, y=stride_times, fill = conditions)) +
+  geom_boxplot(width=0.6) +
   scale_fill_brewer(palette="Spectral") +
   theme(axis.text.x = element_text(angle = 45))
+  scale_x_discrete(breaks=subs, expand=c(2,4))
+print(p)
 
 ```
 
