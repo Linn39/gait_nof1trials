@@ -180,8 +180,11 @@ diff_df <- cbind.data.frame(diff_df_list)
 ```
 
 ```{r}
-diff_df_plot <- gather(diff_df, key = "condition", value = "mean",
-                          st_control, st_fatigue, dt_control, dt_fatigue)
+# convert to data.frame and gather
+diff_df$cond_diff <- rownames(diff_df)
+diff_df_plot <- gather(diff_df, sub, value, sub_01:sub_18, factor_key=TRUE)
+ggplot(diff_df_plot, aes(cond_diff, sub)) + geom_tile(aes(fill=value))
+
 ```
 
 
