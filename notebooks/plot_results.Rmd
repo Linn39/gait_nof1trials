@@ -146,7 +146,7 @@ all_strides_df <- all_strides_df[all_strides_df$foot == "left", ]  # filter left
 all_strides_df["conditions"] <- paste(all_strides_df$condition, all_strides_df$fatigue, sep="-")
 
 subs <- unique(all_strides_df$sub)
-p <- ggplot(all_strides_df, aes(x = sub, y=stride_times, fill = conditions)) +
+p <- ggplot(all_strides_df, aes(x = sub, y=stride_lengths, fill = conditions)) +
   geom_boxplot(width=0.6) +
   scale_fill_brewer(palette="Spectral") +
   theme(axis.text.x = element_text(angle = 45))
@@ -155,18 +155,33 @@ print(p)
 
 ```
 
+Heatmap of the gait parameter changes
+```{r}
+param <- "stride_lengths"
+
+# generate unique combinations of the conditions
+cond_table <- table(unique(conditions_df_all["condition"]))
+cond_comb_table <- combinations(names(cond_table), k = 2, freq = cond_table)
+
+idx_comb <- combn(unique(c(1, 2, 3, 4)),2)
+
+diff_df_list <- list()
+subs <-  unique(conditions_df_mean$sub)
+for (i in 1:length(subs)) {
+  sub_df <- conditions_df_mean[conditions_df_mean$sub == subs[i] & conditions_df_mean$var == param, ]
+  diff <- sub_df$mean[unlist(idx_comb[1,])] - sub_df$mean[unlist(idx_comb[2,])]
+  diff_names <- paste(sub_df$condition[unlist(idx_comb[1,])], sub_df$condition[unlist(idx_comb[2,])], sep="-")
+  sub_diff_df <- as.data.frame(setNames(diff, diff_names))  # create dataframe for this subject
+  names(sub_diff_df) <- subs[i]  # rename column to subject
+  diff_df_list[[i]] <- sub_diff_df
+}
+diff_df <- cbind.data.frame(diff_df_list)
+
+```
 
 ```{r}
-summary_df <- read_csv(file.path("..", "data", "processed", "means.csv"), show_col_types = FALSE)
-# Adding column based on other column:
-summary_df <- summary_df %>%
-  mutate(condition = case_when(
-    (fatigue == 0 & condition == 0) ~ "st_control",
-    (fatigue == 1 & condition == 0) ~ "st_fatigue",
-    (fatigue == 0 & condition == 1) ~ "dt_control",
-    (fatigue == 1 & condition == 1) ~ "dt_fatigue"
-    ))
-
+diff_df_plot <- gather(diff_df, key = "condition", value = "mean",
+                          st_control, st_fatigue, dt_control, dt_fatigue)
 ```
 
 
