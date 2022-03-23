@@ -157,7 +157,7 @@ print(p)
 
 Heatmap of the gait parameter changes
 ```{r}
-param <- "stride_lengths"
+param <- "stride_times"
 
 # generate unique combinations of the conditions
 cond_table <- table(unique(conditions_df_all["condition"]))
@@ -179,11 +179,26 @@ diff_df <- cbind.data.frame(diff_df_list)
 
 ```
 
+# ```{r}
+# library(RColorBrewer)
+# diff_mat <- as.matrix(diff_df)  # convert to matrix for plotting
+# coul <- colorRampPalette(brewer.pal(8, "PiYG"))(25)
+# heatmap(diff_mat, Colv = NA, Rowv = NA, scale="column", col = brewer.pal("RdBu"))
+# ```
+
+
 ```{r}
 # convert to data.frame and gather
+library(RColorBrewer)
+library(colorspace)
 diff_df$cond_diff <- rownames(diff_df)
 diff_df_plot <- gather(diff_df, sub, value, sub_01:sub_18, factor_key=TRUE)
-ggplot(diff_df_plot, aes(cond_diff, sub)) + geom_tile(aes(fill=value))
+ggplot(diff_df_plot, aes(cond_diff, sub, fill = value)) + 
+  geom_tile() +
+  # scale_fill_distiller(palette = "RdBu") +
+  scale_fill_continuous_divergingx(palette = 'RdBu', mid = 0, l1 = 0, l3 = 0, p3 = 0.8, p4 = 0.6) +
+  theme(axis.text.x = element_text(vjust=0.6, angle = 45)) + 
+  xlab(param)
 
 ```
 
