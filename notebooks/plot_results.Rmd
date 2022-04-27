@@ -127,14 +127,15 @@ plot_df <- bind_rows(plot_df, conditions_df_all)
 ```
 
 ```{r, fig.width = 8, fig.height = 3}
-param <- "stride_lengths"
+param <- "stride_times"
 plot_param_df <- filter(plot_df, var == param)
 p <- ggplot(plot_param_df, aes(x = sub, fill = condition)) +
   geom_boxplot(aes(ymin =mean-3*sd, lower = mean-sd, middle = mean, upper = mean+sd, ymax = mean+3*sd),
                stat = "identity", width=0.6) +
   scale_fill_brewer(palette="Spectral") +
-  theme(axis.text.x = element_text(angle = 45))
-p <- p + labs(title=param)
+  theme(axis.text.x = element_text(angle = 45)) +
+  ylab(param)
+# p <- p + labs(title=param)
 par(las=2)
 print(p)
 ```
@@ -146,7 +147,7 @@ all_strides_df <- all_strides_df[all_strides_df$foot == "left", ]  # filter left
 all_strides_df["conditions"] <- paste(all_strides_df$condition, all_strides_df$fatigue, sep="-")
 
 subs <- unique(all_strides_df$sub)
-p <- ggplot(all_strides_df, aes(x = sub, y=stride_lengths, fill = conditions)) +
+p <- ggplot(all_strides_df, aes(x = sub, y=stride_times, fill = conditions)) +
   geom_boxplot(width=0.6) +
   scale_fill_brewer(palette="Spectral") +
   theme(axis.text.x = element_text(angle = 45))
@@ -154,6 +155,13 @@ p <- ggplot(all_strides_df, aes(x = sub, y=stride_lengths, fill = conditions)) +
 print(p)
 
 ```
+
+Make table to report posterior estimations
+```{r}
+report_df <- all_estimate_df %>% select(parameter, mean, X2.5., X97.5., sub, var)
+
+```
+
 
 Heatmap of the gait parameter changes
 ```{r}
