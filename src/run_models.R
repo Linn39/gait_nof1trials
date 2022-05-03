@@ -28,25 +28,19 @@ print("start running...")
 
 #### choose a model
 
-model_n <- 4
+model_n <- 1
 downsample_step <- 1
 
 likelihood_models <- list(
   "fact_anovaModel_default.txt",
   "fact_anovaModel_default_time_cov.txt",
-  "mixed_model_lagged_res.txt",
-  "mixed_model_lagged_res_new.txt",  # swap model difinition and priors
-  "mixed_model_AR1.txt",
-  "mixed_model_CS.txt"
+  "mixed_model_AR1.txt"
 )
 
 model_names <- list(
   "default",
   "default_time_cov",
-  "lagged_res",
-  "lagged_res_new",
-  "AR1",
-  "CS"
+  "AR1"
 )
 print(likelihood_models[[model_n]])
 
@@ -55,10 +49,10 @@ print(likelihood_models[[model_n]])
 cond_list <- list("dt", "st")
 test_list <- list("fatigue", "control")
 IMU_loc <- list('LFRF_all_strides')  # LFRF_windowed, LF, RF, LFRF_all_strides
-kw <- IMU_loc[[1]]  # safety measure, for now we only load one location at a time
+kw <- IMU_loc[[1]]  # list as a safety measure, for now we only load one location at a time
 
 sub_list <- list(  # for n-of-1 trials, select only one subject!
-  # "sub_01"
+  "sub_01",
   "sub_02",
   "sub_03",
   "sub_05",
@@ -89,46 +83,17 @@ loc_df$fatigue[loc_df$fatigue == "fatigue"] <- 1
 loc_df$condition[loc_df$condition == "st"] <- 0
 loc_df$condition[loc_df$condition == "dt"] <- 1
 
-# select list of features
+# select list of features / gait paarameters
 features_list <- c(
   'stride_lengths',
-  # 'clearances_min_avg', 
-  # 'clearances_max_avg',
   'stride_times'
-  # 'swing_times_avg',
-  # 'stance_times_avg',
-  # 'stance_ratios_avg', 
-  # 'cadence_avg',
-  # 'speed_avg'
-  # 'stride_lengths_CV',
-  # 'clearances_min_CV', 
-  # 'clearances_max_CV', 
-  # 'stride_times_CV',
-  # 'swing_times_CV', 
-  # 'stance_times_CV', 
-  # 'stance_ratios_CV', 
-  # 'cadence_CV',
-  # 'speed_CV', 
-  # 'stride_lengths_SI', 
-  # 'clearances_min_SI',
-  # 'clearances_max_SI', 
-  # 'stride_times_SI', 
-  # 'swing_times_SI',
-  # 'stance_times_SI', 
-  # 'stance_ratios_SI', 
-  # 'cadence_SI', 
-  # 'speed_SI'
 )
 
 # loop through all subjects and all features
 output_folder <- file.path("data", "processed", paste0("jags_output_left_foot_downsample_", as.character(downsample_step)))
 dir.create(output_folder, showWarnings = FALSE)
 
-# registerDoParallel(cores = 5)
-# 
 all_estimate_df <- data.frame()
-# all_estimated_df_list <- foreach (subject = sub_list) %:% 
-#   foreach (feature = features_list) %dopar% {
 for (subject in sub_list) {
   for (feature in features_list) {
     print(subject)
