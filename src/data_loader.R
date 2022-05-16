@@ -57,7 +57,7 @@ print_data_summary <- function (df, var) {
   df %>%
     group_by(fatigue, condition) %>%
     summarize(
-      n = n(),
+      n = length(var),
       mean = mean(var),
       sd = sd(var)
       ) %>%

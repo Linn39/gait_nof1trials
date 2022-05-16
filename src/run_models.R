@@ -75,7 +75,6 @@ loc_df <- load_gait_parameters(folder_path, kw,  sub, test, cond)
 loc_df <- loc_df[loc_df$foot == "left", ]
 loc_df <- downsample_rows(loc_df[loc_df$foot == "left", ], downsample_step) # reduce data size
 print(paste("Downsample by", downsample_step))
-print_data_summary(loc_df, "stride_lengths")
 
 # rename the label columns to 1 and 0
 loc_df$fatigue[loc_df$fatigue == "control"] <- 0
@@ -101,6 +100,7 @@ for (subject in sub_list) {
     # filter the dataframe
     dat_df <- filter(loc_df, sub == subject)
     dat_df <- dat_df[, c(feature, "fatigue", "condition")]
+    print_data_summary(dat_df, "stride_lengths")
     dat_df <- rename(dat_df,c('y' = feature))
     print(paste("Current sample size:", nrow(dat_df)))
     
