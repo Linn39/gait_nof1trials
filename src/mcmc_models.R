@@ -123,7 +123,7 @@ for (i in 1:ngroups) {
 beta[i] ~ dnorm(0,1.0E-6)
 }
 sigma <- z/sqrt(chSq)    # prior for sigma; cauchy = normal/sqrt(chi^2)
-z ~ dnorm(0, 0.04)I(0,)
+z ~ dnorm(0, 0.04)I(0,)  # half-normal distribution with only positive part
 chSq ~ dgamma(0.5, 0.5)  # chi^2 with 1 d.f.
 sigma2 = pow(sigma,2)
 #tau.cor <- tau #* (1- phi*phi)
@@ -136,7 +136,7 @@ phi ~ dunif(-1,1)
 for (i in 1:ngroups) {
 beta[i] ~ dnorm(0,1.0E-6)
 }
-z ~ dnorm(0, 0.04)I(0,)
+z ~ dnorm(0, 0.04)I(0,)  # half-normal distribution with only positive part
 chSq ~ dgamma(0.5, 0.5)  # chi^2 with 1 d.f.
 sigma <- z/sqrt(chSq)    # prior for sigma; cauchy = normal/sqrt(chi^2)
 sigma2 = pow(sigma,2)
