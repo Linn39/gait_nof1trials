@@ -48,6 +48,22 @@ load_gait_parameters <- function (folder_path, keyword, subject, test, cond) {
   return(dat_df)
 }
 
+print_data_summary <- function (df, var) {
+  ### num. of samples, in each category, mean +- SD
+  print(paste("Dataset total sample size:", nrow(loc_df)))
+  print(sprintf("Dataset summary for %s:", var))
+  # rename variable of interest
+  names(df)[names(df) == var] <- "var"
+  df %>%
+    group_by(fatigue, condition) %>%
+    summarize(
+      n = n(),
+      mean = mean(var),
+      sd = sd(var)
+      ) %>%
+    print()
+}
+
 downsample_rows <- function (df, step) {
   ### select every nth row in order to reduce dataset size
   new_df <- df[seq(1, nrow(df), step), ]

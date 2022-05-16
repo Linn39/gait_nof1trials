@@ -75,7 +75,7 @@ loc_df <- load_gait_parameters(folder_path, kw,  sub, test, cond)
 loc_df <- loc_df[loc_df$foot == "left", ]
 loc_df <- downsample_rows(loc_df[loc_df$foot == "left", ], downsample_step) # reduce data size
 print(paste("Downsample by", downsample_step))
-print(paste("Dataset total sample size:", nrow(loc_df)))
+print_data_summary(loc_df, "stride_lengths")
 
 # rename the label columns to 1 and 0
 loc_df$fatigue[loc_df$fatigue == "control"] <- 0
