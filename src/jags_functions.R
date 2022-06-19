@@ -21,6 +21,7 @@ run_jags <- function(df, X, model_file) {
   data.r2jags <- jags.parallel(
     data = data.list, 
     inits = NULL, 
+    # jags.module = c("glm","dic"),  # these are loaded by default anyways
     parameters.to.save = params,
     model.file = model_file, 
     n.chains = nChains, 
