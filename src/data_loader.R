@@ -61,6 +61,8 @@ print_data_summary <- function (df, var) {
       mean = mean(var),
       sd = sd(var)
       ) %>%
+    as.data.frame(.) %>% 
+    mutate_if(is.numeric, round, 4) %>%
     print()
 }
 
