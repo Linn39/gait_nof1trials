@@ -1,14 +1,11 @@
 library(dplyr)
 
 #### load gait data
-load_gait_parameters <- function (folder_path, keyword, subject, test, cond) {
+load_gait_parameters <- function (folder_path, keyword) {
   
-  #### first find file name by keyward ####
+  #### first find file name by keyword ####
   file_path <- c()
   kw_fn_list <- list()  # keyword - file name pairs
-  kw_fn_list[[ "LF" ]] <- "left_foot_core_params_py_n.csv"
-  kw_fn_list[[ "RF" ]] <- "right_foot_core_params_py_n.csv"
-  kw_fn_list[[ "LFRF_windowed" ]] <- "agg_windows_control_fatigue_st_dt_10_2.csv"
   kw_fn_list[[ "LFRF_all_strides" ]] <- "df_all.csv"
   
   # look up file names
@@ -20,31 +17,17 @@ load_gait_parameters <- function (folder_path, keyword, subject, test, cond) {
   }
   
   #### then load the data ####
-  if (grepl("windowed", keyword, fixed = TRUE)) {
+if (keyword == "LFRF_all_strides") {
     folder_path <- file.path("data/processed", "features")
     data_path <- file.path(folder_path, file_name)
     dat_df <- readr::read_csv(data_path, col_names = T, show_col_types = FALSE)  
-    # dat_df <- dat_df[(dat_df$)]
-  }
-  else if (keyword == "LFRF_all_strides") {
-    folder_path <- file.path("data/processed", "features")
-    data_path <- file.path(folder_path, file_name)
-    dat_df <- readr::read_csv(data_path, col_names = T, show_col_types = FALSE)  
-  }
-  else {
-    folder_path <- file.path("data/processed", paste0("OG_", cond, "_", test), sub)
-    data_path <- file.path(folder_path, file_name)
-    dat_df <- readr::read_csv(data_path, col_names = T, show_col_types = FALSE)
+    
     # remove outlier strides
-    loc_df <- loc_df[(dat_df$is_outlier == FALSE) & 
+    dat_df <- dat_df[(dat_df$is_outlier == FALSE) & 
                        (dat_df$turning_interval == FALSE) & 
                        (dat_df$interrupted == FALSE),
     ]
   }
-  
-  data_path <- file.path(folder_path, file_name)
-  dat_df <- readr::read_csv(data_path, col_names = T, show_col_types = FALSE)
-  
   return(dat_df)
 }
 
@@ -61,6 +44,23 @@ print_data_summary <- function (df, var) {
       mean = mean(var),
       sd = sd(var)
       ) %>%
+    as.data.frame(.) %>% 
+    mutate_if(is.numeric, round, 4) %>%
+    print()
+}
+
+print_subject_summary <- function (df, var) {
+  print(sprintf("Summary for %s:", var))
+  # rename variable of interest
+  names(df)[names(df) == var] <- "var"
+  df %>%
+    summarize(
+      n = length(var),
+      mean = mean(var),
+      sd = sd(var),
+      min = min(var),
+      max = max(var)
+    ) %>%
     as.data.frame(.) %>% 
     mutate_if(is.numeric, round, 4) %>%
     print()
