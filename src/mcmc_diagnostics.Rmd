@@ -14,13 +14,26 @@ library(coda)
 print(getwd())
 
 # import r2jags data
-n <- 2
+n <- 3
 analyses <- list(
   "jags_output",  # the standard model
-  "jags_output_left_foot_downsample_2"  # with downsampled stride-by-stride data
+  "jags_output_left_foot_downsample_2",  # with downsampled stride-by-stride data
+  "cauchy_conjugate_jags_output_left_foot_downsample_5"
   )
-data.r2jags <- get(load(file.path("..", "data", "processed", analyses[[n]], "data_r2jags_AR1_stride_lengths_sub_05.RData")))   # 
+data.r2jags <- get(load(file.path("..", "data", "processed", analyses[[n]], "data_r2jags_AR1_stride_lengths_sub_01.RData")))   # 
 ```
+
+```{r}
+# explore interactions by applying specific contrasts to the already fit model
+mcmc <- data.r2jags$BUGSoutput$sims.matrix
+wch = grep("^beta", colnames(mcmc))
+newdata = expand.grid(A = levels(data$fatigue), B = levels(data$condition))
+Xmat = model.matrix(~A * B, data = newdata)
+coefs = mcmc[, wch]
+fit = coefs %*% t(Xmat)
+head(fit)
+```
+
 
 Print posterior estimates
 ```{r}
