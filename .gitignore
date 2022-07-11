@@ -3,6 +3,9 @@
 .RData
 .Ruserdata
 
+# exclude vscode 
+.vscode/
+
 # exclude Mac system files
 .DS_Store
 
