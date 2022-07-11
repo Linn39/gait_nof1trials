@@ -18,11 +18,9 @@ source("./src/jags_functions.R")
 opts_chunk$set(echo=TRUE, comment='') 
 # for nicely formatted tables 
 options(knitr.table.format = "latex")
-tic("start running")
-print("start running...")
 
 #### choose a model
-model_n <- 1  # choose from the list of models
+model_n <- 3 # choose from the list of models
 downsample_step <- 5
 
 model_names <- list(
@@ -92,8 +90,8 @@ output_folder <- file.path("data", "processed", paste0("cauchy_conjugate_left_fo
 dir.create(output_folder, showWarnings = FALSE)
 
 all_estimate_df <- data.frame()
-for (subject in sub_list) {
-  for (feature in features_list) {
+for (feature in features_list) {
+  for (subject in sub_list) {
     print(subject)
     print(feature)
     # filter the dataframe
@@ -113,7 +111,11 @@ for (subject in sub_list) {
     if (model_names[[model_n]] == "default_time_cov") {
       X <- append_time(X)  # append the time column to X, apply this only when considering time as covariate
     }
+    tic("start running")
+    print("start running...")
     data.r2jags <- run_jags(dat_df, X, file.path("models", models[[model_n]]))
+    print("...finished running")
+    toc()
     # save simulation outputs
     save(data.r2jags, file = file.path(output_folder, paste0(
       "data_r2jags_",
@@ -130,15 +132,10 @@ for (subject in sub_list) {
     all_estimate_df <- bind_rows(all_estimate_df, get_jags_table(data.r2jags, subject, feature))
     # get_jags_table(data.r2jags, subject, feature)
   }
-}
-# all_estimate_df <- bind_rows(all_estimated_df_list)
-
-# save estimated parameters table
-write.csv(
+  # save estimated parameters table
+  write.csv(
   all_estimate_df, 
-  file = file.path(output_folder, paste0("all_estimates_", model_names[[model_n]], ".csv")), 
+  file = file.path(output_folder, paste0("all_estimates_", feature, "_" model_names[[model_n]], ".csv")), 
   row.names=FALSE
-)
-
-print("...finished running")
-toc()
+  )
+}
