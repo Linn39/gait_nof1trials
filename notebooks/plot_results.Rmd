@@ -165,12 +165,11 @@ report_df <- all_estimate_df %>% select(parameter, mean, X2.5., X97.5., sub, var
 
 Heatmap of the gait parameter changes
 ```{r}
-param <- "stride_times"
+# param <- "stride_times"  
+param <- "stride_lengths"  
 
 # generate unique combinations of the conditions
 cond_table <- table(unique(conditions_df_all["condition"]))
-cond_comb_table <- combinations(names(cond_table), k = 2, freq = cond_table)
-
 idx_comb <- combn(unique(c(1, 2, 3, 4)),2)
 
 diff_df_list <- list()
@@ -178,7 +177,7 @@ subs <-  unique(conditions_df_mean$sub)
 for (i in 1:length(subs)) {
   sub_df <- conditions_df_mean[conditions_df_mean$sub == subs[i] & conditions_df_mean$var == param, ]
   diff <- sub_df$mean[unlist(idx_comb[1,])] - sub_df$mean[unlist(idx_comb[2,])]
-  diff_names <- paste(sub_df$condition[unlist(idx_comb[1,])], sub_df$condition[unlist(idx_comb[2,])], sep="-")
+  diff_names <- paste(sub_df$condition[unlist(idx_comb[1,])], sub_df$condition[unlist(idx_comb[2,])], sep=" - ")
   sub_diff_df <- as.data.frame(setNames(diff, diff_names))  # create dataframe for this subject
   names(sub_diff_df) <- subs[i]  # rename column to subject
   diff_df_list[[i]] <- sub_diff_df
@@ -201,8 +200,9 @@ library(RColorBrewer)
 library(colorspace)
 diff_df$cond_diff <- rownames(diff_df)
 diff_df_plot <- gather(diff_df, sub, value, sub_01:sub_18, factor_key=TRUE)
-ggplot(diff_df_plot, aes(cond_diff, sub, fill = value)) + 
+ggplot(diff_df_plot, aes(sub, cond_diff, fill = value)) + 
   geom_tile() +
+  coord_equal() +
   # scale_fill_distiller(palette = "RdBu") +
   scale_fill_continuous_divergingx(palette = 'RdBu', mid = 0, l1 = 0, l3 = 0, p3 = 0.8, p4 = 0.6) +
   theme(axis.text.x = element_text(vjust=0.6, angle = 45)) + 
