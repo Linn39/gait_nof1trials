@@ -1,4 +1,7 @@
-# create and save Bayesian models for Monte Carlo Markov Chain
+# create and save Bayesian models
+
+#### create folder to save the models
+dir.create(file.path("./models/"), showWarnings = FALSE)
 
 #### define the default likelihood model
 modelString = " 
