@@ -20,19 +20,23 @@ opts_chunk$set(echo=TRUE, comment='')
 options(knitr.table.format = "latex")
 
 #### choose a model
-model_n <- 3 # choose from the list of models
+model_n <- 4 # choose from the list of models
 downsample_step <- 5
 
 model_names <- list(
   "default",
+  "default_informed",
   "default_time_cov",
+  "default_time_cov_informed",
   "AR1",
   "AR1_cauchy_t"
 )
 
 models <- list(
   "fact_anovaModel_default.txt",
+  "fact_anovaModel_default_informed.txt",
   "fact_anovaModel_default.txt",
+  "fact_anovaModel_default_informed.txt",
   "mixed_model_AR1.txt",
   "mixed_model_AR1_cauchy_t.txt"
 )
@@ -108,7 +112,7 @@ for (feature in features_list) {
     # run jags
     # run_jags.options(silent.jags=TRUE, silent.runjags=TRUE)
     X <- model.matrix(~condition * fatigue, dat_df)   # X is the design matrix, including intercept
-    if (model_names[[model_n]] == "default_time_cov") {
+    if (grepl("time_cov", model_names[[model_n]], fixed = TRUE)) {
       X <- append_time(X)  # append the time column to X, apply this only when considering time as covariate
     }
     tic("start running")
@@ -135,7 +139,7 @@ for (feature in features_list) {
   # save estimated parameters table
   write.csv(
   all_estimate_df, 
-  file = file.path(output_folder, paste0("all_estimates_", feature, "_" model_names[[model_n]], ".csv")), 
+  file = file.path(output_folder, paste0("all_estimates_", feature, "_", model_names[[model_n]], ".csv")), 
   row.names=FALSE
   )
 }
