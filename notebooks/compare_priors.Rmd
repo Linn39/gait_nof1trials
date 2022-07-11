@@ -11,6 +11,7 @@ Try executing this chunk by clicking the *Run* button within the chunk or by pla
 library(dplyr)
 library(ggplot2)
 library(RColorBrewer)
+source("../src/data_loader.R")
 
 gait_parameter <- "stride_lengths"
 experiment <- "cauchy_conjugate_left_foot_downsample_5"
@@ -59,6 +60,42 @@ p <- ggplot(
   ggtitle(paste0(gait_parameter, " posterior from all 16 subjects"))
 p + facet_wrap( ~ parameter, scales="free")
 ```
+```{r}
+# for (model in c("AR1", ))
+# all_est_AR1 <- all_est_df %>% filter(model=="AR1") 
+# all_est_default <- all_est_df %>% filter(model=="Default") 
+# all_est_time_cov <- all_est_df %>% filter(model=="Time Covariate") 
+
+# names(df)[names(df) == var] <- "var"
+for (model_param in c("beta[1]", "beta[2]", "beta[3]", "beta[4]")) {
+  all_est_df %>% 
+  filter(parameter==model_param)  %>%
+  group_by(model) %>%
+  summarize(
+    n = length(mean),
+    mean = mean(mean),
+    sd = sd(mean)
+    ) %>%
+  as.data.frame(.) %>% 
+  mutate_if(is.numeric, round, 4) %>%
+  print()
+}
+
+# get real data
+all_strides_df <- read_csv(file.path("..", "data", "processed", "means.csv"), show_col_types = FALSE)
+all_strides_df <- all_strides_df[c(gait_parameter, "fatigue", "condition")]
+beta1 <- all_strides_df %>% filter(fatigue==0, condition==0)
+beta2 <- all_strides_df %>% filter(fatigue==0, condition==1) - beta1
+beta3 <- all_strides_df %>% filter(fatigue==1, condition==0) - beta1
+beta4 <- all_strides_df %>% filter(fatigue==1, condition==1) - beta1 - beta2 - beta3
+for (beta in list(beta1, beta2, beta3, beta4)) {
+  print(mean(beta[[gait_parameter]]))
+}
+# print("Mean observed data for beta[1]:")
+# print(mean(st_control_df[[gait_parameter]]))
+
+```
+
 
 Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
 
