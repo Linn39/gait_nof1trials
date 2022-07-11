@@ -12,16 +12,17 @@ library(dplyr)
 library(ggplot2)
 library(RColorBrewer)
 
-gait_parameter <- "cadence"
+gait_parameter <- "stride_lengths"
+experiment <- "cauchy_conjugate_left_foot_downsample_5"
 
 file_names = c(
   paste0("all_estimates_", gait_parameter, "_default.csv"),
-  paste0("all_estimates_", gait_parameter, "_sigma1000.csv")   # prior
+  paste0("all_estimates_", gait_parameter, "_default_time_cov.csv")   # prior
 )
 
 df_list <- list()
 for (i in 1:length(file_names)) {
-  folder_path <- file.path("..", "data", "processed")
+  folder_path <- file.path("..", "data", "processed", experiment)
   data_path <- file.path(folder_path, file_names[i])
   est_df <- readr::read_csv(data_path, col_names = T, show_col_types = FALSE)
   est_df$model <- file_names[i]
@@ -35,6 +36,15 @@ p <- ggplot(
   aes(x=parameter, y=mean)) + 
   geom_boxplot(aes(fill=as.factor(model))) + 
   geom_point(aes(y=mean, group=model), position = position_dodge(width=0.75)) + 
+  guides(fill=guide_legend(title="Likelihood Model")) + 
+  ggtitle(paste0(gait_parameter, " estimation from all 16 subjects"))
+p + facet_wrap( ~ parameter, scales="free")
+
+p <- ggplot(
+  data = all_est_df, 
+  aes(x=parameter, y=sd)) + 
+  geom_boxplot(aes(fill=as.factor(model))) + 
+  geom_point(aes(y=sd, group=model), position = position_dodge(width=0.75)) + 
   guides(fill=guide_legend(title="Likelihood Model")) + 
   ggtitle(paste0(gait_parameter, " estimation from all 16 subjects"))
 p + facet_wrap( ~ parameter, scales="free")
