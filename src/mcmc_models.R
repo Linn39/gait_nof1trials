@@ -4,7 +4,7 @@
 dir.create(file.path("./models/"), showWarnings = FALSE)
 
 #### define the default likelihood model
-modelString = " 
+model_string = " 
   model {
   #Likelihood
   for (i in 1:n) {
@@ -21,32 +21,31 @@ modelString = "
   }
 "
 
-modelString_new = "
+model_string_informative_priors = "
   model {
-
-  #Priors
-  for(i in 1:ngroups) {
-  beta[i] ~ dnorm(0,1.0E-3)
-  }
-  sigma ~ dunif(0, 100)
-  tau <- 1 / (sigma * sigma)
-
   #Likelihood
   for (i in 1:n) {
   y[i]~dnorm(mean[i],tau)
   mean[i] <- inprod(beta[],X[i,])
   }
-
+  
+   #Priors
+  beta[1] ~ dnorm(1.36,8.0E-2)
+  for(i in 2:ngroups) {
+  beta[i] ~ dnorm(0,1.0E-3)
+  }
+  sigma ~ dunif(0, 100)
+  tau <- 1 / (sigma * sigma)
   }
 "
 # write the model to a text file
-writeLines(modelString, con = file.path("models", "fact_anovaModel_default.txt")) 
-writeLines(modelString_new, con = file.path("models", "new_fact_anovaModel_default.txt")) 
+writeLines(model_string, con = file.path("models", "fact_anovaModel_default.txt")) 
+writeLines(model_string_informative_priors, con = file.path("models", "fact_anovaModel_default_inform.txt")) 
 
 
 #### model incorporating first order autoregressive (AR1) residual autocorrelation structure
 # following tutorial at: https://agabrioblog.onrender.com/tutorial/autocorrelation-jags/autocorrelation-jags/
-modelString_cauchy_t = "
+model_string_cauchy_t = "
 model {
 #Likelihood
 for (i in 1:n) {
@@ -63,14 +62,14 @@ Omega <- inverse(Sigma)
 #Priors
 phi ~ dunif(-1,1)
 for (i in 1:ngroups) {
-beta[i] ~ dnorm(0,1.0E-6)
+beta[i] ~ dnorm(0,1.0E-3)
 }
-tau ~ dscaled.gamma(25, 1)  # half-Cauchy distribution (t distribution with 1.d.f.), scale = 25
+tau ~ dscaled.gamma(2.5, 1)  # half-Cauchy distribution (t distribution with 1.d.f.), scale = 2.5
 sigma2 = 1/tau
 }
 "
 
-modelString = "
+model_string = "
 model {
 #Likelihood
 for (i in 1:n) {
@@ -87,7 +86,7 @@ Omega <- inverse(Sigma)
 #Priors
 phi ~ dunif(-1,1)
 for (i in 1:ngroups) {
-beta[i] ~ dnorm(0,1.0E-6)
+beta[i] ~ dnorm(0,1.0E-3)
 }
 sigma <- z/sqrt(chSq)    # prior for sigma; cauchy = normal/sqrt(chi^2)
 z ~ dnorm(0, 0.16)I(0,)  # half-normal distribution with only positive part, Cauchy scale = 2.5
@@ -97,12 +96,12 @@ sigma2 = pow(sigma,2)
 }
 "
 
-modelString_new = "
+model_string_new = "
 model {
 #Priors
 phi ~ dunif(-1,1)
 for (i in 1:ngroups) {
-beta[i] ~ dnorm(0,1.0E-6)
+beta[i] ~ dnorm(0,1.0E-3)
 }
 z ~ dnorm(0, 0.16)I(0,)  # half-normal distribution with only positive part, Cauchy scale = 2.5
 chSq ~ dgamma(0.5, 0.5)  # chi^2 with 1 d.f.
@@ -123,6 +122,6 @@ Sigma[i,j] <- sigma2*(equals(i,j) + (1-equals(i,j))*pow(phi,abs(i-j)))
 "
 
 # write the model to a text file
-writeLines(modelString_cauchy_t, con = file.path("models", "mixed_model_AR1_cauchy_t.txt"))
-writeLines(modelString, con = file.path("models", "mixed_model_AR1.txt"))
-writeLines(modelString_new, con = file.path("models", "new_mixed_model_AR1.txt"))
+writeLines(model_string_cauchy_t, con = file.path("models", "mixed_model_AR1_cauchy_t.txt"))
+writeLines(model_string, con = file.path("models", "mixed_model_AR1.txt"))
+writeLines(model_string_new, con = file.path("models", "new_mixed_model_AR1.txt"))
