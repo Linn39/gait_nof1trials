@@ -22,15 +22,8 @@ tic("start running")
 print("start running...")
 
 #### choose a model
-model_n <- 4  # choose from the list of models
+model_n <- 1  # choose from the list of models
 downsample_step <- 5
-
-models <- list(
-  "fact_anovaModel_default.txt",
-  "fact_anovaModel_default_time_cov.txt",
-  "mixed_model_AR1.txt",
-  "mixed_model_AR1_cauchy_t.txt"
-)
 
 model_names <- list(
   "default",
@@ -38,6 +31,14 @@ model_names <- list(
   "AR1",
   "AR1_cauchy_t"
 )
+
+models <- list(
+  "fact_anovaModel_default.txt",
+  "fact_anovaModel_default.txt",
+  "mixed_model_AR1.txt",
+  "mixed_model_AR1_cauchy_t.txt"
+)
+
 print(models[[model_n]])
 
 ## load & concat .csv file
@@ -47,7 +48,7 @@ IMU_loc <- list('LFRF_all_strides')  # LFRF_windowed, LF, RF, LFRF_all_strides
 kw <- IMU_loc[[1]]  # list as a safety measure, for now we only load one location at a time
 
 sub_list <- list(  # for n-of-1 trials, select only one subject!
-  "sub_01"
+  # "sub_01"
   # "sub_02",
   # "sub_03",
   # "sub_05",
@@ -58,7 +59,7 @@ sub_list <- list(  # for n-of-1 trials, select only one subject!
   # "sub_10",
   # "sub_11",
   # "sub_12",
-  # "sub_13",
+  "sub_13"
   # "sub_14",
   # "sub_15",
   # "sub_17",
@@ -81,8 +82,8 @@ loc_df$condition[loc_df$condition == "dt"] <- 1
 
 # select list of features / gait paarameters
 features_list <- c(
-  'stride_lengths'
-  # 'stride_times'
+  # 'stride_lengths'
+  'stride_times'
 )
 
 # loop through all subjects and all features
@@ -108,6 +109,9 @@ for (subject in sub_list) {
     # run jags
     # run_jags.options(silent.jags=TRUE, silent.runjags=TRUE)
     X <- model.matrix(~condition * fatigue, dat_df)   # X is the design matrix, including intercept
+    if (model_names[[model_n]] == "default_time_cov") {
+      X <- append_time(X)  # append the time column to X, apply this only when considering time as covariate
+    }
     data.r2jags <- run_jags(dat_df, X, file.path("models", models[[model_n]]))
     # save simulation outputs
     save(data.r2jags, file = file.path(output_folder, paste0(

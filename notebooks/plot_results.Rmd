@@ -73,9 +73,9 @@ read_path <- file.path("..", "data", "processed", paste0("jags_output_left_foot_
 all_estimate_df <- data.frame()
 for (gait_param in c("stride_lengths", "stride_times")) {
   for (sub in sub_list) {
-  file_name <- paste0("data_r2jags_", model_names[model_n], "_", gait_param, "_", sub, ".RData")
-  load(file.path(read_path, file_name))
-  all_estimate_df <- bind_rows(all_estimate_df, get_jags_table(data.r2jags, sub, gait_param))
+    file_name <- paste0("data_r2jags_", model_names[model_n], "_", gait_param, "_", sub, ".RData")
+    load(file.path(read_path, file_name))
+    all_estimate_df <- bind_rows(all_estimate_df, get_jags_table(data.r2jags, sub, gait_param))
   }
 }
 

@@ -13,7 +13,7 @@ Try executing this chunk by clicking the *Run* button within the chunk or by pla
 suppressMessages(library(plotly))
 library(ggplot2)
 
-data_path <- file.path("..", "data", "ANOVA_try_prior", "all_estimates_default.csv")
+data_path <- file.path("..", "data", "processed", "cauchy_conjugate_jags_output_left_foot_downsample_5", "all_estimates_default.csv")
 all_est_df <- readr::read_csv(data_path, col_names = T, show_col_types = FALSE)
 
 fig <- plot_ly(
@@ -32,9 +32,7 @@ fig
 ```{r}
 gait_parameter_list <- list(
   "stride_lengths_avg",
-  "stride_times_avg",
-  "cadence_avg",
-  "speed_avg"
+  "stride_times_avg"
 )
 
 for (gait_parameter in gait_parameter_list) {
