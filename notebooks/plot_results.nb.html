@@ -221,29 +221,14 @@ pre code {
 <h1>import posterior estimations</h1>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucm0obGlzdD1scygpKVxuIyBrbml0cjo6b3B0c19jaHVuayRzZXQoZWNobyA9IFRSVUUsIGZpZy53aWR0aCA9IDE1LCBmaWcuaGVpZ2h0ID0gNSlcblxubGlicmFyeShkcGx5cikgXG5saWJyYXJ5KGdncGxvdDIpXG5saWJyYXJ5KHRpZHl2ZXJzZSlcbmBgYCJ9 -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucm0obGlzdD1scygpKVxuIyBrbml0cjo6b3B0c19jaHVuayRzZXQoZWNobyA9IFRSVUUsIGZpZy53aWR0aCA9IDE1LCBmaWcuaGVpZ2h0ID0gNSlcblxubGlicmFyeShkcGx5cikgXG5saWJyYXJ5KGdncGxvdDIpXG5saWJyYXJ5KHRpZHl2ZXJzZSlcbnNvdXJjZShcIi4uL3NyYy9qYWdzX2Z1bmN0aW9ucy5SXCIpXG5cbiMjIyMgY2hvb3NlIGEgbW9kZWxcblxubW9kZWxfbiA8LSA1XG5cbmxpa2VsaWhvb2RfbW9kZWxzIDwtIGxpc3QoXG4gIFwiZmFjdF9hbm92YU1vZGVsX2RlZmF1bHQudHh0XCIsXG4gIFwiZmFjdF9hbm92YU1vZGVsX2RlZmF1bHRfdGltZV9jb3YudHh0XCIsXG4gIFwibWl4ZWRfbW9kZWxfbGFnZ2VkX3Jlcy50eHRcIixcbiAgXCJtaXhlZF9tb2RlbF9sYWdnZWRfcmVzX25ldy50eHRcIiwgICMgc3dhcCBtb2RlbCBkaWZpbml0aW9uIGFuZCBwcmlvcnNcbiAgXCJtaXhlZF9tb2RlbF9BUjEudHh0XCIsXG4gIFwibWl4ZWRfbW9kZWxfQ1MudHh0XCJcbilcblxubW9kZWxfbmFtZXMgPC0gbGlzdChcbiAgXCJkZWZhdWx0XCIsXG4gIFwiZGVmYXVsdF90aW1lX2NvdlwiLFxuICBcImxhZ2dlZF9yZXNcIixcbiAgXCJsYWdnZWRfcmVzX25ld1wiLFxuICBcIkFSMVwiLFxuICBcIkNTXCJcbilcblxuc3ViX2xpc3QgPC0gbGlzdCggICMgZm9yIG4tb2YtMSB0cmlhbHMsIHNlbGVjdCBvbmx5IG9uZSBzdWJqZWN0IVxuICBcInN1Yl8wMVwiLFxuICBcInN1Yl8wMlwiLFxuICBcInN1Yl8wM1wiLFxuICBcInN1Yl8wNVwiLFxuICBcInN1Yl8wNlwiLFxuICBcInN1Yl8wN1wiLFxuICBcInN1Yl8wOFwiLFxuICBcInN1Yl8wOVwiLFxuICBcInN1Yl8xMFwiLFxuICBcInN1Yl8xMVwiLFxuICBcInN1Yl8xMlwiLFxuICBcInN1Yl8xM1wiLFxuICBcInN1Yl8xNFwiLFxuICBcInN1Yl8xNVwiLFxuICBcInN1Yl8xN1wiLFxuICBcInN1Yl8xOFwiXG4gIClcblxucHJpbnQobGlrZWxpaG9vZF9tb2RlbHNbW21vZGVsX25dXSlcbmBgYCJ9 -->
 <pre class="r"><code>rm(list=ls())
 # knitr::opts_chunk$set(echo = TRUE, fig.width = 15, fig.height = 5)
 
 library(dplyr) 
 library(ggplot2)
-library(tidyverse)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiUmVnaXN0ZXJlZCBTMyBtZXRob2RzIG92ZXJ3cml0dGVuIGJ5ICdkYnBseXInOlxuICBtZXRob2QgICAgICAgICBmcm9tXG4gIHByaW50LnRibF9sYXp5ICAgICBcbiAgcHJpbnQudGJsX3NxbCAgICAgIFxu4pSA4pSAIEF0dGFjaGluZyBwYWNrYWdlcyDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIAgdGlkeXZlcnNlIDEuMy4xIOKUgOKUgFxu4pyTIHRpYmJsZSAgMy4xLjUgICAgIOKckyBwdXJyciAgIDAuMy40XG7inJMgdGlkeXIgICAxLjEuNCAgICAg4pyTIHN0cmluZ3IgMS40LjBcbuKckyByZWFkciAgIDIuMC4yICAgICDinJMgZm9yY2F0cyAwLjUuMVxu4pSA4pSAIENvbmZsaWN0cyDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIAgdGlkeXZlcnNlX2NvbmZsaWN0cygpIOKUgOKUgFxueCBkcGx5cjo6ZmlsdGVyKCkgbWFza3Mgc3RhdHM6OmZpbHRlcigpXG54IGRwbHlyOjpsYWcoKSAgICBtYXNrcyBzdGF0czo6bGFnKClcbiJ9 -->
-<pre><code>Registered S3 methods overwritten by &#39;dbplyr&#39;:
-  method         from
-  print.tbl_lazy     
-  print.tbl_sql      
-── Attaching packages ────────────────────────────────────────────────────────────────────────────── tidyverse 1.3.1 ──
-✓ tibble  3.1.5     ✓ purrr   0.3.4
-✓ tidyr   1.1.4     ✓ stringr 1.4.0
-✓ readr   2.0.2     ✓ forcats 0.5.1
-── Conflicts ───────────────────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
-x dplyr::filter() masks stats::filter()
-x dplyr::lag()    masks stats::lag()</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc291cmNlKFwiLi4vc3JjL2phZ3NfZnVuY3Rpb25zLlJcIilcblxuIyMjIyBjaG9vc2UgYSBtb2RlbFxuXG5tb2RlbF9uIDwtIDVcblxubGlrZWxpaG9vZF9tb2RlbHMgPC0gbGlzdChcbiAgXCJmYWN0X2Fub3ZhTW9kZWxfZGVmYXVsdC50eHRcIixcbiAgXCJmYWN0X2Fub3ZhTW9kZWxfZGVmYXVsdF90aW1lX2Nvdi50eHRcIixcbiAgXCJtaXhlZF9tb2RlbF9sYWdnZWRfcmVzLnR4dFwiLFxuICBcIm1peGVkX21vZGVsX2xhZ2dlZF9yZXNfbmV3LnR4dFwiLCAgIyBzd2FwIG1vZGVsIGRpZmluaXRpb24gYW5kIHByaW9yc1xuICBcIm1peGVkX21vZGVsX0FSMS50eHRcIixcbiAgXCJtaXhlZF9tb2RlbF9DUy50eHRcIlxuKVxuXG5tb2RlbF9uYW1lcyA8LSBsaXN0KFxuICBcImRlZmF1bHRcIixcbiAgXCJkZWZhdWx0X3RpbWVfY292XCIsXG4gIFwibGFnZ2VkX3Jlc1wiLFxuICBcImxhZ2dlZF9yZXNfbmV3XCIsXG4gIFwiQVIxXCIsXG4gIFwiQ1NcIlxuKVxuXG5zdWJfbGlzdCA8LSBsaXN0KCAgIyBmb3Igbi1vZi0xIHRyaWFscywgc2VsZWN0IG9ubHkgb25lIHN1YmplY3QhXG4gIFwic3ViXzAxXCIsXG4gIFwic3ViXzAyXCIsXG4gIFwic3ViXzAzXCIsXG4gIFwic3ViXzA1XCIsXG4gIFwic3ViXzA2XCIsXG4gIFwic3ViXzA3XCIsXG4gIFwic3ViXzA4XCIsXG4gIFwic3ViXzA5XCIsXG4gIFwic3ViXzEwXCIsXG4gIFwic3ViXzExXCIsXG4gIFwic3ViXzEyXCIsXG4gIFwic3ViXzEzXCIsXG4gIFwic3ViXzE0XCIsXG4gIFwic3ViXzE1XCIsXG4gIFwic3ViXzE3XCIsXG4gIFwic3ViXzE4XCJcbiAgKVxuXG5wcmludChsaWtlbGlob29kX21vZGVsc1tbbW9kZWxfbl1dKVxuYGBgIn0= -->
-<pre class="r"><code>source(&quot;../src/jags_functions.R&quot;)
+library(tidyverse)
+source(&quot;../src/jags_functions.R&quot;)
 
 #### choose a model
 
