@@ -18,9 +18,10 @@ n <- 3
 analyses <- list(
   "jags_output",  # the standard model
   "jags_output_left_foot_downsample_2",  # with downsampled stride-by-stride data
-  "cauchy_conjugate_jags_output_left_foot_downsample_5"
+  "cauchy_conjugate_left_foot_downsample_5"
   )
-data.r2jags <- get(load(file.path("..", "data", "processed", analyses[[n]], "data_r2jags_AR1_stride_lengths_sub_01.RData")))   # 
+# print(file.path(".", "data", "processed", analyses[[n]], "data_r2jags_AR1_stride_lengths_sub_01.RData"))
+data.r2jags <- get(load(file.path("..", "data", "processed", analyses[[n]], "data_r2jags_AR1_stride_lengths_sub_01.RData")))   #
 ```
 
 ```{r}
@@ -40,6 +41,9 @@ Print posterior estimates
 print(data.r2jags$BUGSoutput$summary)
 ```
 
+```{r}
+effectiveSize(data.r2jags)
+```
 
 ```{r}
 # density plot
@@ -47,8 +51,18 @@ denplot(data.r2jags, parms = c("beta", "sigma", "phi"))
 ```
 ```{r}
 # trace plot
-traplot(data.r2jags, parms = c("beta", "sigma", "phi"))
+traplot(as.mcmc(data.r2jags), parms = c("beta", "sigma", "phi"))
+# traceplot(data.r2jags, col = c("beta", "sigma", "phi"), xlab="Iterations")
 ```
+```{r}
+plot(as.mcmc(data.r2jags))
+```
+```{r}
+gelman.diag(as.mcmc(data.r2jags))
+gelman.plot(as.mcmc(data.r2jags))
+```
+
+
 Running plots
 Running plots show each posterior draw per iteration by variable for each chain. The dark line in this plot indicates the posterior mean for that chain. We want these means to be as equal as possible, or make sure that the chains are exploring the same area. For both chains, we also want to see the draws from the posterior distribution stay as close as possible to the posterior mean. If the observations bounce around too much, it is an indication that the posterior has not reached a stationary distribution.
 https://static1.squarespace.com/static/610c1467ea1d4a02e9c1a010/t/610c3e967c967e2ab20086d6/1628192407632/BayesLabDay3.pdf

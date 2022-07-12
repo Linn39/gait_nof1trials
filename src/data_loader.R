@@ -78,4 +78,3 @@ summary_mean <- function (df) {
     summarise_each(funs(mean))
   return(means_df)
 }
-
