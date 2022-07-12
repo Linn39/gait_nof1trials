@@ -201,7 +201,7 @@ library(colorspace)
 diff_df$cond_diff <- rownames(diff_df)
 diff_df_plot <- gather(diff_df, sub, value, sub_01:sub_18, factor_key=TRUE)
 ggplot(diff_df_plot, aes(sub, cond_diff, fill = value)) + 
-  geom_tile() +
+  geom_tile(color="white") +
   coord_equal() +
   # scale_fill_distiller(palette = "RdBu") +
   scale_fill_continuous_divergingx(palette = 'RdBu', mid = 0, l1 = 0, l3 = 0, p3 = 0.8, p4 = 0.6) +
