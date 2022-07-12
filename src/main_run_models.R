@@ -20,7 +20,7 @@ opts_chunk$set(echo=TRUE, comment='')
 options(knitr.table.format = "latex")
 
 #### choose a model
-model_n <- 4 # choose from the list of models
+model_n <- 6 # choose from the list of models
 downsample_step <- 5
 
 model_names <- list(
@@ -29,6 +29,7 @@ model_names <- list(
   "default_time_cov",
   "default_time_cov_informed",
   "AR1",
+  "AR1_informed",
   "AR1_cauchy_t"
 )
 
@@ -38,6 +39,7 @@ models <- list(
   "fact_anovaModel_default.txt",
   "fact_anovaModel_default_informed.txt",
   "mixed_model_AR1.txt",
+  "mixed_model_AR1_informed.txt",
   "mixed_model_AR1_cauchy_t.txt"
 )
 
