@@ -21,14 +21,16 @@ file_names <- c(
   paste0("all_estimates_", gait_parameter, "_default_informed.csv"),
   paste0("all_estimates_", gait_parameter, "_default_time_cov.csv"),
   paste0("all_estimates_", gait_parameter, "_default_time_cov_informed.csv"),
-  paste0("all_estimates_", gait_parameter, "_AR1.csv")
+  paste0("all_estimates_", gait_parameter, "_AR1.csv"),
+  paste0("all_estimates_", gait_parameter, "_AR1_informed.csv")
 )
 model_names <- c(
   "Default",
   "Default (Informed)", 
   "Time Covariate",
   "Time Covariate (Informed)",
-  "AR1"
+  "AR1",
+  "AR1 (Informed)"
 )
 
 df_list <- list()
