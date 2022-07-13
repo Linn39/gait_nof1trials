@@ -49,9 +49,9 @@ model_string_cauchy_t = "
 model {
 #Likelihood
 for (i in 1:n) {
-mu[i] <- inprod(beta[],X[i,])
+mean[i] <- inprod(beta[],X[i,])
 }
-y[1:n] ~ dmnorm(mu[1:n],Omega)
+y[1:n] ~ dmnorm(mean[1:n],Omega)
 for (i in 1:n) {
 for (j in 1:n) {
 Sigma[i,j] <- sigma2*(1- phi*phi)*(equals(i,j) + (1-equals(i,j))*pow(phi,abs(i-j))) 
@@ -73,9 +73,9 @@ model_string = "
 model {
 #Likelihood
 for (i in 1:n) {
-mu[i] <- inprod(beta[],X[i,])
+mean[i] <- inprod(beta[],X[i,])
 }
-y[1:n] ~ dmnorm(mu[1:n],Omega)
+y[1:n] ~ dmnorm(mean[1:n],Omega)
 for (i in 1:n) {
 for (j in 1:n) {
 Sigma[i,j] <- sigma2*(1- phi*phi)*(equals(i,j) + (1-equals(i,j))*pow(phi,abs(i-j))) 
@@ -100,9 +100,9 @@ model_string_informative_priors = "
 model {
 #Likelihood
 for (i in 1:n) {
-mu[i] <- inprod(beta[],X[i,])
+mean[i] <- inprod(beta[],X[i,])
 }
-y[1:n] ~ dmnorm(mu[1:n],Omega)
+y[1:n] ~ dmnorm(mean[1:n],Omega)
 for (i in 1:n) {
 for (j in 1:n) {
 Sigma[i,j] <- sigma2*(1- phi*phi)*(equals(i,j) + (1-equals(i,j))*pow(phi,abs(i-j))) 
@@ -137,10 +137,10 @@ sigma <- z/sqrt(chSq)    # prior for sigma; cauchy = normal/sqrt(chi^2)
 sigma2 = pow(sigma,2)
 #Likelihood
 for (i in 1:n) {
-mu[i] <- inprod(beta[i],X[i,])
+mean[i] <- inprod(beta[i],X[i,])
 }
 Omega <- inverse(Sigma)
-y[1:n] ~ dmnorm(mu[1:n],Omega)
+y[1:n] ~ dmnorm(mean[1:n],Omega)
 for (i in 1:n) {
 for (j in 1:n) {
 Sigma[i,j] <- sigma2*(equals(i,j) + (1-equals(i,j))*pow(phi,abs(i-j))) 
