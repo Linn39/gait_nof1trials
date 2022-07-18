@@ -64,6 +64,7 @@ p <- ggplot(
 p + facet_wrap( ~ parameter, scales="free")
 ```
 ```{r}
+library(readr)
 # for (model in c("AR1", ))
 # all_est_AR1 <- all_est_df %>% filter(model=="AR1") 
 # all_est_default <- all_est_df %>% filter(model=="Default") 
