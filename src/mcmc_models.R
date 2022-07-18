@@ -39,8 +39,8 @@ tau <- 1 / (sigma * sigma)
 }
 "
 # write the model to a text file
-writeLines(model_string, con = file.path("models", "fact_anovaModel_default.txt")) 
-writeLines(model_string_informative_priors, con = file.path("models", "fact_anovaModel_default_informed.txt")) 
+writeLines(model_string, con = file.path("models", "fact_anovaModel_basic.txt")) 
+writeLines(model_string_informative_priors, con = file.path("models", "fact_anovaModel_basic_informed.txt")) 
 
 
 #### model incorporating first order autoregressive (AR1) residual autocorrelation structure

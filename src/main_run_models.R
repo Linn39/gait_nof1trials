@@ -24,20 +24,20 @@ model_n <- 6 # choose from the list of models
 downsample_step <- 5
 
 model_names <- list(
-  "default",
-  "default_informed",
-  "default_time_cov",
-  "default_time_cov_informed",
+  "basic",
+  "basic_informed",
+  "basic_time_cov",
+  "basic_time_cov_informed",
   "AR1",
   "AR1_informed",
   "AR1_cauchy_t"
 )
 
 models <- list(
-  "fact_anovaModel_default.txt",
-  "fact_anovaModel_default_informed.txt",
-  "fact_anovaModel_default.txt",
-  "fact_anovaModel_default_informed.txt",
+  "fact_anovaModel_basic.txt",
+  "fact_anovaModel_basic_informed.txt",
+  "fact_anovaModel_basic.txt",
+  "fact_anovaModel_basic_informed.txt",
   "mixed_model_AR1.txt",
   "mixed_model_AR1_informed.txt",
   "mixed_model_AR1_cauchy_t.txt"

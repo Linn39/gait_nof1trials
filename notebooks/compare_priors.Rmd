@@ -17,16 +17,16 @@ gait_parameter <- "stride_lengths"
 experiment <- "cauchy_conjugate_left_foot_downsample_5"
 
 file_names <- c(
-  paste0("all_estimates_", gait_parameter, "_default.csv"),
-  paste0("all_estimates_", gait_parameter, "_default_informed.csv"),
-  paste0("all_estimates_", gait_parameter, "_default_time_cov.csv"),
-  paste0("all_estimates_", gait_parameter, "_default_time_cov_informed.csv"),
+  paste0("all_estimates_", gait_parameter, "_basic.csv"),
+  paste0("all_estimates_", gait_parameter, "_basic_informed.csv"),
+  paste0("all_estimates_", gait_parameter, "_basic_time_cov.csv"),
+  paste0("all_estimates_", gait_parameter, "_basic_time_cov_informed.csv"),
   paste0("all_estimates_", gait_parameter, "_AR1.csv"),
   paste0("all_estimates_", gait_parameter, "_AR1_informed.csv")
 )
 model_names <- c(
-  "Default",
-  "Default (Informed)", 
+  "Basic",
+  "Basic (Informed)", 
   "Time Covariate",
   "Time Covariate (Informed)",
   "AR1",
@@ -43,6 +43,7 @@ for (i in 1:length(file_names)) {
   df_list[[i]] <- est_df 
 }
 all_est_df <- bind_rows(df_list)
+all_est_df <- all_est_df[!(all_est_df$parameter == "deviance"), ]  # remove deviance from the plot
 
 p <- ggplot(
   data = all_est_df, 
