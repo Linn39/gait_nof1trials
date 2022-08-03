@@ -20,21 +20,8 @@ analyses <- list(
   "jags_output_left_foot_downsample_2",  # with downsampled stride-by-stride data
   "cauchy_conjugate_left_foot_downsample_5"
   )
-# print(file.path(".", "data", "processed", analyses[[n]], "data_r2jags_AR1_stride_lengths_sub_01.RData"))
 data.r2jags <- get(load(file.path("..", "data", "processed", analyses[[n]], "data_r2jags_AR1_stride_lengths_sub_01.RData")))   #
 ```
-
-```{r}
-# explore interactions by applying specific contrasts to the already fit model
-mcmc <- data.r2jags$BUGSoutput$sims.matrix
-wch = grep("^beta", colnames(mcmc))
-newdata = expand.grid(A = levels(data$fatigue), B = levels(data$condition))
-Xmat = model.matrix(~A * B, data = newdata)
-coefs = mcmc[, wch]
-fit = coefs %*% t(Xmat)
-head(fit)
-```
-
 
 Print posterior estimates
 ```{r}
@@ -61,19 +48,6 @@ plot(as.mcmc(data.r2jags))
 gelman.diag(as.mcmc(data.r2jags))
 gelman.plot(as.mcmc(data.r2jags))
 ```
-
-
-Running plots
-Running plots show each posterior draw per iteration by variable for each chain. The dark line in this plot indicates the posterior mean for that chain. We want these means to be as equal as possible, or make sure that the chains are exploring the same area. For both chains, we also want to see the draws from the posterior distribution stay as close as possible to the posterior mean. If the observations bounce around too much, it is an indication that the posterior has not reached a stationary distribution.
-https://static1.squarespace.com/static/610c1467ea1d4a02e9c1a010/t/610c3e967c967e2ab20086d6/1628192407632/BayesLabDay3.pdf
-```{r}
-library(ggmcmc)
-data.gg<-ggs(as.mcmc(data.r2jags))
-ggs_running(data.gg)
-# ggs_traceplot(data.gg)
-```
-
-
 Raftery diagnostics: require no more than N samples to reach the specified level of confidence in convergence
 You can interpret this test by looking at the feasibility of convergence. Generally speaking, you want for the total number of needed iterations to be less than 100,000. Any more than 100,000 gives cause for concern.
 https://rdrr.io/cran/coda/man/raftery.diag.html
