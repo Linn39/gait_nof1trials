@@ -26,11 +26,11 @@ file_names <- c(
 )
 model_names <- c(
   "Basic",
-  "Basic (Informed)", 
+  "Basic (Informative)", 
   "Time Covariate",
-  "Time Covariate (Informed)",
+  "Time Covariate (Informative)",
   "AR1",
-  "AR1 (Informed)"
+  "AR1 (Informative)"
 )
 
 df_list <- list()
