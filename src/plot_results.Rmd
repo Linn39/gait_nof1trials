@@ -118,25 +118,40 @@ conditions_df_mean_all["sub"] <- "all"
 # conditions_df_sd_all <- aggregate(sd~condition+var, conditions_df_sd, function(x) sqrt(sum(x^2)))  # aggregate SD
 conditions_df_sd_all<- aggregate(mean~condition+var, conditions_df_mean, sd)  # SD of means
 names(conditions_df_sd_all)[names(conditions_df_sd_all) == 'mean'] <- 'sd'
-conditions_df_sd_all["sub"] <- "all"
+conditions_df_sd_all["su "] <- "all"
 
 conditions_df_all <- merge(conditions_df_mean_all, conditions_df_sd_all)
 # put all dataframes together
 plot_df <- bind_rows(plot_df, conditions_df_all)
 
+# rename for plotting
+plot_df <- plot_df %>% 
+  rename(
+    Participant = sub,
+    Condition = condition
+    )
+plot_df[plot_df == "stride_lengths"] <- "Stride Length [m]"
+plot_df[plot_df == "stride_times"] <- "Stride Time [s]"
+plot_df[plot_df == "st_control"] <- "ST-Control"
+plot_df[plot_df == "st_fatigue"] <- "ST-Fatigue"
+plot_df[plot_df == "dt_control"] <- "DT-Control"
+plot_df[plot_df == "dt_fatigue"] <- "DT-Fatigue"
+plot_df[plot_df == "all"] <- "All"
+
 ```
 
-```{r, fig.width = 8, fig.height = 3}
-param <- "stride_times"
-plot_param_df <- filter(plot_df, var == param)
-p <- ggplot(plot_param_df, aes(x = sub, fill = condition)) +
+```{r, fig.width = 7, fig.height = 5}
+p <- ggplot(plot_df, aes(x = Participant, fill = Condition)) +
   geom_boxplot(aes(ymin =mean-3*sd, lower = mean-sd, middle = mean, upper = mean+sd, ymax = mean+3*sd),
                stat = "identity", width=0.6) +
   scale_fill_brewer(palette="Spectral") +
-  theme(axis.text.x = element_text(angle = 45)) +
-  ylab(param)
-# p <- p + labs(title=param)
-par(las=2)
+  theme(axis.text.x = element_text(angle = 45, vjust=0.6))
+p <- p + facet_wrap(vars(var), nrow = 2, strip.position = "left", scales = "free_y") +
+  theme(strip.background=element_rect( fill="white"), 
+        strip.placement = "outside",
+        panel.spacing.y = unit(1, "lines")
+        )
+  
 print(p)
 ```
 
