@@ -15,6 +15,9 @@ rm(list=ls())
 library(dplyr) 
 library(ggplot2)
 library(tidyverse)
+library(reshape2)
+
+source("../src/data_loader.R")
 source("../src/jags_functions.R")
 
 #### choose a model
@@ -156,6 +159,47 @@ print(p)
 ```
 
 Summary of the real data
+```{r, fig.width = 8, fig.height = 4}
+all_observations_df <- read_csv(file.path("..", "data", "processed", "features", "df_all.csv"), show_col_types = FALSE)
+all_observations_df <- downsample_rows(all_observations_df[all_observations_df$foot == "left", ], 5) # reduce data size to match the data used for JAGS models
+all_observations_df["conditions"] <- paste(all_observations_df$condition, all_observations_df$fatigue, sep="_")
+
+# add mean over all subjects
+all_observations_df_all <- all_observations_df
+all_observations_df_all["sub"] <- "All"
+# browser()
+all_observations_df <- rbind(all_observations_df, all_observations_df_all)
+
+# melt gait parameters of interest into one column for facet plot
+all_observations_df <- melt(all_observations_df, id.vars = c("sub", "conditions"), measure.vars = c("stride_lengths","stride_times"))
+
+# rename for plotting
+all_observations_df <- all_observations_df %>% 
+  rename(
+    Participant = sub,
+    Condition = conditions
+    )
+all_observations_df[all_observations_df == "st_control"] <- "ST-Control"
+all_observations_df[all_observations_df == "st_fatigue"] <- "ST-Fatigue"
+all_observations_df[all_observations_df == "dt_control"] <- "DT-Control"
+all_observations_df[all_observations_df == "dt_fatigue"] <- "DT-Fatigue"
+all_observations_df[all_observations_df == "stride_lengths"] <- "Stride Length [m]"
+all_observations_df[all_observations_df == "stride_times"] <- "Stride Time [s]"
+
+p <- ggplot(all_observations_df, aes(x = Participant, y=value, fill = Condition)) +
+  geom_boxplot(width=0.6) +
+  scale_fill_brewer(palette="Spectral") +
+  theme(axis.text.x = element_text(angle = 45, vjust=0.6))
+  
+p <- p + facet_wrap(vars(variable), nrow = 2, strip.position = "left", scales = "free_y") +
+  theme(strip.background=element_rect( fill="white"), 
+        strip.placement = "outside",
+        panel.spacing.y = unit(1, "lines")
+        )
+print(p)
+
+```
+
 ```{r, fig.width = 8, fig.height = 3}
 all_strides_df <- read_csv(file.path("..", "data", "processed", "features", "df_all.csv"), show_col_types = FALSE)
 all_strides_df <- all_strides_df[all_strides_df$foot == "left", ]  # filter left foot to match the data used for JAGS models
