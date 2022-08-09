@@ -63,6 +63,7 @@ p <- ggplot(
   ggtitle(paste0(gait_parameter, " posterior from all 16 subjects"))
 p + facet_wrap( ~ parameter, scales="free")
 ```
+
 ```{r}
 library(readr)
 # for (model in c("AR1", ))
