@@ -24,7 +24,7 @@ source("../src/jags_functions.R")
 
 model_n <- 5
 
-likelihood_models <- list(
+models <- list(
   "fact_anovaModel_default.txt",
   "fact_anovaModel_default_time_cov.txt",
   "mixed_model_lagged_res.txt",
@@ -61,26 +61,24 @@ sub_list <- list(  # for n-of-1 trials, select only one subject!
   "sub_18"
   )
 
-print(likelihood_models[[model_n]])
+print(models[[model_n]])
 
 # read posterior estimations from file
-if (model_names[model_n] == "AR1") {
-  downsample_n <- 5
-} else {
-  downsample_n <- 1
-}
+downsample_n <- 5
+file_name <- "all_estimates_AR1.csv"
+read_path <- file.path("..", "data", "processed", paste0("cauchy_conjugate_left_foot_downsample_", downsample_n))
+file_path <- file.path(read_path, file_name)
+all_estimate_df <- readr::read_csv(file_path, col_names = T, show_col_types = FALSE)
 
-read_path <- file.path("..", "data", "processed", paste0("jags_output_left_foot_downsample_", downsample_n))
-
-# collect estimates for all subjects
-all_estimate_df <- data.frame()
-for (gait_param in c("stride_lengths", "stride_times")) {
-  for (sub in sub_list) {
-    file_name <- paste0("data_r2jags_", model_names[model_n], "_", gait_param, "_", sub, ".RData")
-    load(file.path(read_path, file_name))
-    all_estimate_df <- bind_rows(all_estimate_df, get_jags_table(data.r2jags, sub, gait_param))
-  }
-}
+# # collect estimates for all subjects
+# all_estimate_df <- data.frame()
+# for (gait_param in c("stride_lengths", "stride_times")) {
+#   for (sub in sub_list) {
+#     file_name <- paste0("data_r2jags_", model_names[model_n], "_", gait_param, "_", sub, ".RData")
+#     load(file.path(read_path, file_name))
+#     all_estimate_df <- bind_rows(all_estimate_df, get_jags_table(data.r2jags, sub, gait_param))
+#   }
+# }
 
 
 ```
@@ -127,6 +125,13 @@ conditions_df_all <- merge(conditions_df_mean_all, conditions_df_sd_all)
 # put all dataframes together
 plot_df <- bind_rows(plot_df, conditions_df_all)
 
+# save estimated parameters table
+write.csv(
+plot_df, 
+file = file.path(read_path, paste0("all_estimates_gait_parameters_", model_names[[model_n]], ".csv")), 
+row.names=FALSE
+)
+
 # rename for plotting
 plot_df <- plot_df %>% 
   rename(
@@ -147,7 +152,9 @@ plot_df[plot_df == "all"] <- "All"
 p <- ggplot(plot_df, aes(x = Participant, fill = Condition)) +
   geom_boxplot(aes(ymin =mean-3*sd, lower = mean-sd, middle = mean, upper = mean+sd, ymax = mean+3*sd),
                stat = "identity", width=0.6) +
+  ylab("Posterior Estimates") +
   scale_fill_brewer(palette="Spectral") +
+  theme_bw() +
   theme(axis.text.x = element_text(angle = 45, vjust=0.6))
 p <- p + facet_wrap(vars(var), nrow = 2, strip.position = "left", scales = "free_y") +
   theme(strip.background=element_rect( fill="white"), 
@@ -158,20 +165,20 @@ p <- p + facet_wrap(vars(var), nrow = 2, strip.position = "left", scales = "free
 print(p)
 ```
 
-Summary of the real data
-```{r, fig.width = 8, fig.height = 4}
+Summary of the observed data
+```{r, fig.width = 7, fig.height = 5}
 all_observations_df <- read_csv(file.path("..", "data", "processed", "features", "df_all.csv"), show_col_types = FALSE)
-all_observations_df <- downsample_rows(all_observations_df[all_observations_df$foot == "left", ], 5) # reduce data size to match the data used for JAGS models
+all_observations_df <- downsample_rows(all_observations_df[all_observations_df$foot == "left", ], downsample_n) # reduce data size to match the data used for JAGS models
 all_observations_df["conditions"] <- paste(all_observations_df$condition, all_observations_df$fatigue, sep="_")
 
 # add mean over all subjects
 all_observations_df_all <- all_observations_df
 all_observations_df_all["sub"] <- "All"
-# browser()
 all_observations_df <- rbind(all_observations_df, all_observations_df_all)
 
 # melt gait parameters of interest into one column for facet plot
 all_observations_df <- melt(all_observations_df, id.vars = c("sub", "conditions"), measure.vars = c("stride_lengths","stride_times"))
+all_observations_df$variable <- as.character(all_observations_df$variable)
 
 # rename for plotting
 all_observations_df <- all_observations_df %>% 
@@ -188,7 +195,9 @@ all_observations_df[all_observations_df == "stride_times"] <- "Stride Time [s]"
 
 p <- ggplot(all_observations_df, aes(x = Participant, y=value, fill = Condition)) +
   geom_boxplot(width=0.6) +
+  ylab("Observed Values") +
   scale_fill_brewer(palette="Spectral") +
+  theme_bw() +
   theme(axis.text.x = element_text(angle = 45, vjust=0.6))
   
 p <- p + facet_wrap(vars(variable), nrow = 2, strip.position = "left", scales = "free_y") +
@@ -196,21 +205,6 @@ p <- p + facet_wrap(vars(variable), nrow = 2, strip.position = "left", scales = 
         strip.placement = "outside",
         panel.spacing.y = unit(1, "lines")
         )
-print(p)
-
-```
-
-```{r, fig.width = 8, fig.height = 3}
-all_strides_df <- read_csv(file.path("..", "data", "processed", "features", "df_all.csv"), show_col_types = FALSE)
-all_strides_df <- all_strides_df[all_strides_df$foot == "left", ]  # filter left foot to match the data used for JAGS models
-all_strides_df["conditions"] <- paste(all_strides_df$condition, all_strides_df$fatigue, sep="-")
-
-subs <- unique(all_strides_df$sub)
-p <- ggplot(all_strides_df, aes(x = sub, y=stride_times, fill = conditions)) +
-  geom_boxplot(width=0.6) +
-  scale_fill_brewer(palette="Spectral") +
-  theme(axis.text.x = element_text(angle = 45))
-  scale_x_discrete(breaks=subs, expand=c(2,4))
 print(p)
 
 ```
