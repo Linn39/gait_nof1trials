@@ -218,48 +218,71 @@ report_df <- all_estimate_df %>% select(parameter, mean, X2.5., X97.5., sub, var
 
 Heatmap of the gait parameter changes
 ```{r}
-# param <- "stride_times"  
-param <- "stride_lengths"  
+vars <- list("stride_lengths", "stride_times")
+
+# rename conditions for plotting
+conditions_df_mean[conditions_df_mean == "st_control"] <- "ST-Control"
+conditions_df_mean[conditions_df_mean == "st_fatigue"] <- "ST-Fatigue"
+conditions_df_mean[conditions_df_mean == "dt_control"] <- "DT-Control"
+conditions_df_mean[conditions_df_mean == "dt_fatigue"] <- "DT-Fatigue"
 
 # generate unique combinations of the conditions
 cond_table <- table(unique(conditions_df_all["condition"]))
 idx_comb <- combn(unique(c(1, 2, 3, 4)),2)
 
-diff_df_list <- list()
+diff_df_subs <- list()
+diff_df_params <- list()
 subs <-  unique(conditions_df_mean$sub)
-for (i in 1:length(subs)) {
-  sub_df <- conditions_df_mean[conditions_df_mean$sub == subs[i] & conditions_df_mean$var == param, ]
+for (j in 1:length(vars)) {
+  for (i in 1:length(subs)) {
+  sub_df <- conditions_df_mean[conditions_df_mean$sub == subs[i] & conditions_df_mean$var == vars[[j]], ]
   diff <- sub_df$mean[unlist(idx_comb[1,])] - sub_df$mean[unlist(idx_comb[2,])]
   diff_names <- paste(sub_df$condition[unlist(idx_comb[1,])], sub_df$condition[unlist(idx_comb[2,])], sep=" - ")
   sub_diff_df <- as.data.frame(setNames(diff, diff_names))  # create dataframe for this subject
   names(sub_diff_df) <- subs[i]  # rename column to subject
-  diff_df_list[[i]] <- sub_diff_df
+  diff_df_subs[[i]] <- sub_diff_df
+  }
+  diff_df <- cbind.data.frame(diff_df_subs)
+  diff_df$cond_diff <- rownames(diff_df)
+  diff_df_plot_var <- gather(diff_df, sub, value, sub_01:sub_18, factor_key=TRUE)
+  # browser()
+  diff_df_plot_var["variable"] <- vars[[j]]
+  diff_df_params[[j]] <- diff_df_plot_var
 }
-diff_df <- cbind.data.frame(diff_df_list)
+diff_df_plot <- bind_rows(diff_df_params)
+
+# rename for plotting
+diff_df_plot <- diff_df_plot %>% 
+  rename(
+    Participant = sub,
+    Conditions = cond_diff,
+    Difference = value
+    )
+diff_df_plot[diff_df_plot == "stride_lengths"] <- "Stride Length [m]"
+diff_df_plot[diff_df_plot == "stride_times"] <- "Stride Time [s]"
 
 ```
 
-# ```{r}
-# library(RColorBrewer)
-# diff_mat <- as.matrix(diff_df)  # convert to matrix for plotting
-# coul <- colorRampPalette(brewer.pal(8, "PiYG"))(25)
-# heatmap(diff_mat, Colv = NA, Rowv = NA, scale="column", col = brewer.pal("RdBu"))
-# ```
-
-
 ```{r}
 # convert to data.frame and gather
-library(RColorBrewer)
-library(colorspace)
-diff_df$cond_diff <- rownames(diff_df)
-diff_df_plot <- gather(diff_df, sub, value, sub_01:sub_18, factor_key=TRUE)
-ggplot(diff_df_plot, aes(sub, cond_diff, fill = value)) + 
+# library(RColorBrewer)
+# library(colorspace)
+
+p <- ggplot(diff_df_plot, aes(Participant, Conditions, fill = Difference)) + 
   geom_tile(color="white") +
   coord_equal() +
+  theme_bw() +
   # scale_fill_distiller(palette = "RdBu") +
-  scale_fill_continuous_divergingx(palette = 'RdBu', mid = 0, l1 = 0, l3 = 0, p3 = 0.8, p4 = 0.6) +
-  theme(axis.text.x = element_text(vjust=0.6, angle = 45)) + 
-  xlab(param)
+  scale_fill_continuous_divergingx(palette = 'Spectral', mid = 0, l1 = 0, l3 = 0, p3 = 0.8, p4 = 0.6) +
+  theme(axis.text.x = element_text(vjust=0.6, angle = 45))
+
+p <- p + facet_grid(rows = vars(variable), switch = "y") +
+  theme(strip.background=element_rect( fill="white"),
+        strip.placement = "outside",
+        panel.spacing.y = unit(1, "lines")
+        )
+
+print(p)
 
 ```
 
