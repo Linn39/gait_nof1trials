@@ -6,7 +6,6 @@ title: "plot results"
 # import posterior estimations
 ```{r} 
 rm(list=ls())
-# knitr::opts_chunk$set(echo = TRUE, fig.width = 15, fig.height = 5)
 
 library(dplyr) 
 library(ggplot2)
@@ -17,7 +16,6 @@ source("../src/data_loader.R")
 source("../src/jags_functions.R")
 
 #### choose a model
-
 model_n <- 5
 
 models <- list(
@@ -216,11 +214,13 @@ for (var in list("Stride Length [m]", "Stride Time [s]")) {
     ylab(var) +
     scale_fill_brewer(palette="Spectral") +
     theme_bw() +
-    theme(axis.text.x = element_text(angle = 45, vjust=0.6))
+    theme(axis.text.x = element_text(angle = 45, vjust=0.6),
+          plot.margin = unit(c(0.5,0.5,2,0.5), "lines"))
   
   fig_combined <- ggarrange(fig_posterior_var, fig_observation_var,
                       labels = c("A", "B"),
-                      ncol = 1, nrow = 2
+                      ncol = 1, nrow = 2,
+                      heights = c(1, 0.9)
                       )
   print(fig_combined)
 }
@@ -276,7 +276,6 @@ fig_diff <- ggplot(diff_df_plot, aes(Participant, Conditions, fill = Difference)
   geom_tile(color="white") +
   coord_equal() +
   theme_bw() +
-  # scale_fill_distiller(palette = "RdBu") +
   scale_fill_continuous_divergingx(palette = 'Spectral', mid = 0, l1 = 0, l3 = 0, p3 = 0.8, p4 = 0.6) +
   theme(axis.text.x = element_text(vjust=0.6, angle = 45))
 

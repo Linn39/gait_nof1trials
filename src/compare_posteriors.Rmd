@@ -76,7 +76,7 @@ for (var in list("stride_lengths", "stride_times")) {
     theme(strip.background=element_rect(fill="white"), 
           strip.placement = "outside",
           panel.spacing.y = unit(1, "lines"),
-          plot.margin = unit(c(0.1,0.1,3,0.1), "lines"))
+          plot.margin = unit(c(0.1,0.1,2,0.1), "lines"))
     
   fig_sd <- ggplot(
     data = all_est_df, 
@@ -93,7 +93,8 @@ for (var in list("stride_lengths", "stride_times")) {
   
   fig_combined <- ggarrange(fig_mean, fig_sd,
                         labels = c("A", "B"),
-                        ncol = 1, nrow = 2
+                        ncol = 1, nrow = 2,
+                        heights = c(1, 0.9)
                         ) 
   print(fig_combined)
 }
