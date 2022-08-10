@@ -149,20 +149,20 @@ plot_df[plot_df == "all"] <- "All"
 ```
 
 ```{r, fig.width = 7, fig.height = 5}
-p <- ggplot(plot_df, aes(x = Participant, fill = Condition)) +
+fig_posterior <- ggplot(plot_df, aes(x = Participant, fill = Condition)) +
   geom_boxplot(aes(ymin =mean-3*sd, lower = mean-sd, middle = mean, upper = mean+sd, ymax = mean+3*sd),
                stat = "identity", width=0.6) +
   ylab("Posterior Estimates") +
   scale_fill_brewer(palette="Spectral") +
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, vjust=0.6))
-p <- p + facet_wrap(vars(var), nrow = 2, strip.position = "left", scales = "free_y") +
+fig_posterior2 <- fig_posterior + facet_wrap(vars(var), nrow = 2, strip.position = "left", scales = "free_y") +
   theme(strip.background=element_rect( fill="white"), 
         strip.placement = "outside",
         panel.spacing.y = unit(1, "lines")
         )
   
-print(p)
+print(fig_posterior2)
 ```
 
 Summary of the observed data
@@ -193,28 +193,54 @@ all_observations_df[all_observations_df == "dt_fatigue"] <- "DT-Fatigue"
 all_observations_df[all_observations_df == "stride_lengths"] <- "Stride Length [m]"
 all_observations_df[all_observations_df == "stride_times"] <- "Stride Time [s]"
 
-p <- ggplot(all_observations_df, aes(x = Participant, y=value, fill = Condition)) +
+fig_observation <- ggplot(all_observations_df, aes(x = Participant, y=value, fill = Condition)) +
   geom_boxplot(width=0.6) +
   ylab("Observed Values") +
   scale_fill_brewer(palette="Spectral") +
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, vjust=0.6))
   
-p <- p + facet_wrap(vars(variable), nrow = 2, strip.position = "left", scales = "free_y") +
+fig_observation2 <- fig_observation + facet_wrap(vars(variable), nrow = 2, strip.position = "left", scales = "free_y") +
   theme(strip.background=element_rect( fill="white"), 
         strip.placement = "outside",
         panel.spacing.y = unit(1, "lines")
         )
-print(p)
+print(fig_observation2)
 
 ```
+Posterior Predictive Check:
+Combine Posterior with Observations
+```{r, fig.width = 8, fig.height = 6}
+library("ggpubr")
 
-Make table to report posterior estimations
-```{r}
-report_df <- all_estimate_df %>% select(parameter, mean, X2.5., X97.5., sub, var)
+for (var in list("Stride Length [m]", "Stride Time [s]")) {
+  fig_observation_var <- ggplot(all_observations_df[all_observations_df$variable == var,], 
+                                aes(x = Participant, 
+                                    y=value, 
+                                    fill = Condition
+                                    )) +
+    geom_boxplot(width=0.6) +
+    ylab(var) +
+    scale_fill_brewer(palette="Spectral") +
+    theme_bw() +
+    theme(axis.text.x = element_text(angle = 45, vjust=0.6))
+  
+  fig_posterior_var <- ggplot(plot_df[plot_df$var == var,], aes(x = Participant, fill = Condition)) +
+    geom_boxplot(aes(ymin =mean-3*sd, lower = mean-sd, middle = mean, upper = mean+sd, ymax = mean+3*sd),
+                 stat = "identity", width=0.6) +
+    ylab(var) +
+    scale_fill_brewer(palette="Spectral") +
+    theme_bw() +
+    theme(axis.text.x = element_text(angle = 45, vjust=0.6))
+  
+  fig_combined <- ggarrange(fig_posterior_var, fig_observation_var,
+                      labels = c("A", "B"),
+                      ncol = 1, nrow = 2
+                      )
+  print(fig_combined)
+}
 
 ```
-
 
 Heatmap of the gait parameter changes
 ```{r}
@@ -268,7 +294,7 @@ diff_df_plot[diff_df_plot == "stride_times"] <- "Stride Time [s]"
 # library(RColorBrewer)
 # library(colorspace)
 
-p <- ggplot(diff_df_plot, aes(Participant, Conditions, fill = Difference)) + 
+fig_diff <- ggplot(diff_df_plot, aes(Participant, Conditions, fill = Difference)) + 
   geom_tile(color="white") +
   coord_equal() +
   theme_bw() +
@@ -276,13 +302,13 @@ p <- ggplot(diff_df_plot, aes(Participant, Conditions, fill = Difference)) +
   scale_fill_continuous_divergingx(palette = 'Spectral', mid = 0, l1 = 0, l3 = 0, p3 = 0.8, p4 = 0.6) +
   theme(axis.text.x = element_text(vjust=0.6, angle = 45))
 
-p <- p + facet_grid(rows = vars(variable), switch = "y") +
+fig_diff2 <- fig_diff + facet_grid(rows = vars(variable), switch = "y") +
   theme(strip.background=element_rect( fill="white"),
         strip.placement = "outside",
         panel.spacing.y = unit(1, "lines")
         )
 
-print(p)
+print(fig_diff2)
 
 ```
 
