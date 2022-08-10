@@ -1,5 +1,5 @@
 ---
-title: "R Notebook"
+title: "Compare Models"
 # output: html_notebook
 ---
 
@@ -7,69 +7,101 @@ This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute
 
 Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
 
-```{r}
+```{r, fig.width = 7, fig.height = 8}
+rm(list=ls())
+
 library(dplyr)
 library(ggplot2)
+library(ggpubr)
 library(RColorBrewer)
 source("../src/data_loader.R")
 
-gait_parameter <- "stride_lengths"
+# var <- "stride_lengths"
 experiment <- "cauchy_conjugate_left_foot_downsample_5"
 
-file_names <- c(
-  paste0("all_estimates_", gait_parameter, "_basic.csv"),
-  paste0("all_estimates_", gait_parameter, "_basic_informed.csv"),
-  paste0("all_estimates_", gait_parameter, "_basic_time_cov.csv"),
-  paste0("all_estimates_", gait_parameter, "_basic_time_cov_informed.csv"),
-  paste0("all_estimates_", gait_parameter, "_AR1.csv"),
-  paste0("all_estimates_", gait_parameter, "_AR1_informed.csv")
-)
-model_names <- c(
-  "Basic",
-  "Basic (Informative)", 
-  "Time Covariate",
-  "Time Covariate (Informative)",
-  "AR1",
-  "AR1 (Informative)"
-)
-
-df_list <- list()
-for (i in 1:length(file_names)) {
-  folder_path <- file.path("..", "data", "processed", experiment)
-  data_path <- file.path(folder_path, file_names[i])
-  est_df <- readr::read_csv(data_path, col_names = T, show_col_types = FALSE)
-  est_df$model <- model_names[i]
+for (var in list("stride_lengths", "stride_times")) {
+  if (var == "stride_lengths") {
+    x_label <- "Stride Length [m]"
+  } else if (var == "stride_times") {
+    x_label <- "Stride Time [s]"
+  }
   
-  df_list[[i]] <- est_df 
+  file_names <- c(
+    paste0("all_estimates_",var, "_basic.csv"),
+    paste0("all_estimates_",var, "_basic_informed.csv"),
+    paste0("all_estimates_",var, "_basic_time_cov.csv"),
+    paste0("all_estimates_",var, "_basic_time_cov_informed.csv"),
+    paste0("all_estimates_",var, "_AR1.csv"),
+    paste0("all_estimates_",var, "_AR1_informed.csv")
+  )
+  model_names <- c(
+    "Basic",
+    "Basic (Informative)", 
+    "Time Covariate",
+    "Time Covariate (Informative)",
+    "AR1",
+    "AR1 (Informative)"
+  )
+  
+  df_list <- list()
+  for (i in 1:length(file_names)) {
+    folder_path <- file.path("..", "data", "processed", experiment)
+    data_path <- file.path(folder_path, file_names[i])
+    est_df <- readr::read_csv(data_path, col_names = T, show_col_types = FALSE)
+    est_df$model <- model_names[i]
+    
+    df_list[[i]] <- est_df 
+  }
+  all_est_df <- bind_rows(df_list)
+  all_est_df <- all_est_df[!(all_est_df$parameter == "deviance"), ]  # remove deviance from the plot
+  
+  # rename for plotting
+  all_est_df <- all_est_df %>% 
+    rename(
+      Parameter = parameter,
+      Mean = mean,
+      SD = sd
+      )
+  
+  fig_mean <- ggplot(
+    data = all_est_df, 
+    aes(x=Parameter, y=Mean)) + 
+    xlab(x_label) +
+    geom_boxplot(aes(fill=as.factor(model))) + 
+    geom_point(aes(y=Mean, group=model), position = position_dodge(width=0.75)) + 
+    guides(fill=guide_legend(title="Model")) + 
+    theme(axis.ticks.x = element_blank()) + 
+    theme_bw()
+  fig_mean <- fig_mean + facet_wrap( ~ Parameter, scales="free") +
+    theme(strip.background=element_rect(fill="white"), 
+          strip.placement = "outside",
+          panel.spacing.y = unit(1, "lines"),
+          plot.margin = unit(c(0.1,0.1,3,0.1), "lines"))
+    
+  fig_sd <- ggplot(
+    data = all_est_df, 
+    aes(x=Parameter, y=SD)) +
+    xlab(x_label) +
+    geom_boxplot(aes(fill=as.factor(model))) + 
+    geom_point(aes(y=SD, group=model), position = position_dodge(width=0.75)) + 
+    guides(fill=guide_legend(title="Model")) + 
+    theme_bw()
+  fig_sd <- fig_sd + facet_wrap( ~ Parameter, scales="free") +
+    theme(strip.background=element_rect( fill="white"), 
+          strip.placement = "outside",
+          panel.spacing.y = unit(1, "lines"))
+  
+  fig_combined <- ggarrange(fig_mean, fig_sd,
+                        labels = c("A", "B"),
+                        ncol = 1, nrow = 2
+                        ) 
+  print(fig_combined)
 }
-all_est_df <- bind_rows(df_list)
-all_est_df <- all_est_df[!(all_est_df$parameter == "deviance"), ]  # remove deviance from the plot
 
-p <- ggplot(
-  data = all_est_df, 
-  aes(x=parameter, y=mean)) + 
-  geom_boxplot(aes(fill=as.factor(model))) + 
-  geom_point(aes(y=mean, group=model), position = position_dodge(width=0.75)) + 
-  guides(fill=guide_legend(title="Likelihood Model")) + 
-  ggtitle(paste0(gait_parameter, " posterior from all 16 subjects"))
-p + facet_wrap( ~ parameter, scales="free")
-
-p <- ggplot(
-  data = all_est_df, 
-  aes(x=parameter, y=sd)) + 
-  geom_boxplot(aes(fill=as.factor(model))) + 
-  geom_point(aes(y=sd, group=model), position = position_dodge(width=0.75)) + 
-  guides(fill=guide_legend(title="Likelihood Model")) + 
-  ggtitle(paste0(gait_parameter, " posterior from all 16 subjects"))
-p + facet_wrap( ~ parameter, scales="free")
 ```
 
 ```{r}
 library(readr)
-# for (model in c("AR1", ))
-# all_est_AR1 <- all_est_df %>% filter(model=="AR1") 
-# all_est_default <- all_est_df %>% filter(model=="Default") 
-# all_est_time_cov <- all_est_df %>% filter(model=="Time Covariate") 
 
 # names(df)[names(df) == var] <- "var"
 for (model_param in c("beta[1]", "beta[2]", "beta[3]", "beta[4]")) {
