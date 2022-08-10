@@ -3,10 +3,6 @@ title: "plot results"
 # output: html_notebook
 ---
 
-This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
-
-Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
-
 # import posterior estimations
 ```{r} 
 rm(list=ls())
@@ -69,17 +65,6 @@ file_name <- "all_estimates_AR1.csv"
 read_path <- file.path("..", "data", "processed", paste0("cauchy_conjugate_left_foot_downsample_", downsample_n))
 file_path <- file.path(read_path, file_name)
 all_estimate_df <- readr::read_csv(file_path, col_names = T, show_col_types = FALSE)
-
-# # collect estimates for all subjects
-# all_estimate_df <- data.frame()
-# for (gait_param in c("stride_lengths", "stride_times")) {
-#   for (sub in sub_list) {
-#     file_name <- paste0("data_r2jags_", model_names[model_n], "_", gait_param, "_", sub, ".RData")
-#     load(file.path(read_path, file_name))
-#     all_estimate_df <- bind_rows(all_estimate_df, get_jags_table(data.r2jags, sub, gait_param))
-#   }
-# }
-
 
 ```
 
@@ -287,13 +272,6 @@ diff_df_plot <- diff_df_plot %>%
 diff_df_plot[diff_df_plot == "stride_lengths"] <- "Stride Length [m]"
 diff_df_plot[diff_df_plot == "stride_times"] <- "Stride Time [s]"
 
-```
-
-```{r}
-# convert to data.frame and gather
-# library(RColorBrewer)
-# library(colorspace)
-
 fig_diff <- ggplot(diff_df_plot, aes(Participant, Conditions, fill = Difference)) + 
   geom_tile(color="white") +
   coord_equal() +
@@ -311,13 +289,3 @@ fig_diff2 <- fig_diff + facet_grid(rows = vars(variable), switch = "y") +
 print(fig_diff2)
 
 ```
-
-
-
-
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
-
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
-
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
-
