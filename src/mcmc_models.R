@@ -82,7 +82,8 @@ Omega <- inverse(Sigma)
 
 #Priors
 phi ~ dunif(-1,1)
-for (i in 1:ngroups) {
+beta[1] ~ dnorm(0,1.0E-3)
+for(i in 2:ngroups) {
 beta[i] ~ dnorm(0,1.0E-3)
 }
 sigma <- z/sqrt(chSq)    # prior for sigma; cauchy = normal/sqrt(chi^2)
