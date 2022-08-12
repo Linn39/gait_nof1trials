@@ -3,10 +3,6 @@ title: "Compare Models"
 # output: html_notebook
 ---
 
-This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
-
-Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
-
 ```{r, fig.width = 7, fig.height = 8}
 rm(list=ls())
 
@@ -112,47 +108,11 @@ for (var in list("stride_lengths")) {  # , "stride_times"
                         heights = c(1, 0.9)
                         ) 
   print(fig_combined)
+  print(paste("Betas for", var))
+  for (beta in list(beta1, beta2, beta3, beta4)) {
+    print(mean(beta[[var]]))
+  }
 }
 
 ```
-
-```{r}
-library(readr)
-
-# names(df)[names(df) == var] <- "var"
-for (model_param in c("beta[1]", "beta[2]", "beta[3]", "beta[4]")) {
-  all_est_df %>% 
-  filter(parameter==model_param)  %>%
-  group_by(model) %>%
-  summarize(
-    n = length(mean),
-    mean = mean(mean),
-    sd = sd(mean)
-    ) %>%
-  as.data.frame(.) %>% 
-  mutate_if(is.numeric, round, 4) %>%
-  print()
-}
-
-# get real data
-all_strides_df <- read_csv(file.path("..", "data", "processed", "means.csv"), show_col_types = FALSE)
-all_strides_df <- all_strides_df[c(gait_parameter, "fatigue", "condition")]
-beta1 <- all_strides_df %>% filter(fatigue==0, condition==0)
-beta2 <- all_strides_df %>% filter(fatigue==0, condition==1) - beta1
-beta3 <- all_strides_df %>% filter(fatigue==1, condition==0) - beta1
-beta4 <- all_strides_df %>% filter(fatigue==1, condition==1) - beta1 - beta2 - beta3
-for (beta in list(beta1, beta2, beta3, beta4)) {
-  print(mean(beta[[gait_parameter]]))
-}
-# print("Mean observed data for beta[1]:")
-# print(mean(st_control_df[[gait_parameter]]))
-
-```
-
-
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
-
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
-
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
 
