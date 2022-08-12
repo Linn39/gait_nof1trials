@@ -22,14 +22,14 @@ features <- list(
   )
 
 #### select a model
-model_n <- 1 # choose from the list of models
+model_n <- 3 # choose from the list of models
 downsample_step <- 5
 
 model_names <- list(
   "basic",
   "basic_informative",
-  "basic_time_cov",
-  "basic_time_cov_informative",
+  "time_cov_basic",
+  "time_cov_basic_informative",
   "AR1",
   "AR1_informative"
 )
@@ -38,19 +38,19 @@ sub_list <- list(
   "sub_01",
   "sub_02",
   "sub_03",
-  "sub_05"
-  # "sub_06",
-  # "sub_07",
-  # "sub_08",
-  # "sub_09",
-  # "sub_10",
-  # "sub_11",
-  # "sub_12",
-  # "sub_13",
-  # "sub_14",
-  # "sub_15",
-  # "sub_17",
-  # "sub_18"
+  "sub_05",
+  "sub_06",
+  "sub_07",
+  "sub_08",
+  "sub_09",
+  "sub_10",
+  "sub_11",
+  "sub_12",
+  "sub_13",
+  "sub_14",
+  "sub_15",
+  "sub_17",
+  "sub_18"
   )
 
 # read data from file
@@ -66,16 +66,21 @@ loc_df$condition[loc_df$condition == "st"] <- 0
 loc_df$condition[loc_df$condition == "dt"] <- 1
 
 # loop through all subjects and all features
-output_folder <- file.path("data", "processed", paste0("test_left_foot_downsample_", as.character(downsample_step)))
+output_folder <- file.path("data", "processed", paste0("all_left_foot_downsample_", as.character(downsample_step)))
 dir.create(output_folder, showWarnings = FALSE)
 
-all_estimate_df <- data.frame()
 for (feature in features) {
+  all_estimate_df <- data.frame()
   print(feature[[1]])
-  if (grepl("informative", model_names[[model_n]], fixed = TRUE)) {
-    model_file <- paste0(model_names[[model_n]], "_", feature[[2]], ".txt")
+  if (grepl("time_cov", model_names[[model_n]], fixed = TRUE)) {
+    file_model_name <- substring(model_names[[model_n]], 10)  # time_cov also uses the basic model
   } else {
-    model_file <- paste0(model_names[[model_n]], ".txt")
+    file_model_name <- model_names[[model_n]]
+  }
+  if (grepl("informative", file_model_name, fixed = TRUE)) {
+    model_file <- paste0(file_model_name, "_", feature[[2]], ".txt")
+  } else {
+    model_file <- paste0(file_model_name, ".txt")
   }
   print(model_names[[model_n]])
   
@@ -121,7 +126,7 @@ for (feature in features) {
   # save estimated parameters table
   write.csv(
   all_estimate_df, 
-  file = file.path(output_folder, paste0("all_estimates_", feature[[2]], "_", model_names[[model_n]], ".csv")), 
+  file = file.path(output_folder, paste0("all_estimates_", feature[[1]], "_", model_names[[model_n]], ".csv")), 
   row.names=FALSE
   )
 }
