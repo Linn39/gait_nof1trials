@@ -12,30 +12,8 @@ library(ggplot2)
 library(tidyverse)
 library(reshape2)
 library(colorspace)
-
 source("../src/data_loader.R")
 source("../src/jags_functions.R")
-
-#### choose a model
-model_n <- 5
-
-models <- list(
-  "fact_anovaModel_default.txt",
-  "fact_anovaModel_default_time_cov.txt",
-  "mixed_model_lagged_res.txt",
-  "mixed_model_lagged_res_new.txt",  # swap model difinition and priors
-  "mixed_model_AR1.txt",
-  "mixed_model_CS.txt"
-)
-
-model_names <- list(
-  "default",
-  "default_time_cov",
-  "lagged_res",
-  "lagged_res_new",
-  "AR1",
-  "CS"
-)
 
 sub_list <- list(  # for n-of-1 trials, select only one subject!
   "sub_01",
@@ -56,16 +34,14 @@ sub_list <- list(  # for n-of-1 trials, select only one subject!
   "sub_18"
   )
 
-print(models[[model_n]])
-
-# read posterior estimations from file
+# # read posterior estimations from file
+model <- "AR1"
 downsample_n <- 5
-file_name <- "all_estimates_AR1.csv"
 read_path <- file.path("..", "data", "processed", paste0("all_left_foot_downsample_", downsample_n))
 
 all_estimate_df <- data.frame()
 for (var in c("stride_lengths", "stride_times")) {
-  file_path <- file.path(read_path, paste0("all_estimates_", var, "_", model_names[[model_n]], ".csv"))
+  file_path <- file.path(read_path, paste0("all_estimates_", var, "_", model, ".csv"))
   estimate_df <- readr::read_csv(file_path, col_names = T, show_col_types = FALSE)
   estimate_df$var <- var
   all_estimate_df <- bind_rows(all_estimate_df, estimate_df)
@@ -81,7 +57,6 @@ beta3 <- filter(all_estimate_df, parameter == "beta[3]")
 beta4 <- filter(all_estimate_df, parameter == "beta[4]")
 
 conditions_df <- beta1[, c("sub", "var")]
-# conditions_df <- beta1["sub"]
 
 value <- "mean"
 conditions_df["st_control"] <- beta1[value]
@@ -106,19 +81,19 @@ conditions_df_mean_all <- aggregate(mean~condition+var, conditions_df_mean, mean
 conditions_df_mean_all["sub"] <- "all"
 
 # add sd of means over all subjects
-# conditions_df_sd_all <- aggregate(sd~condition+var, conditions_df_sd, function(x) sqrt(sum(x^2)))  # aggregate SD
 conditions_df_sd_all<- aggregate(mean~condition+var, conditions_df_mean, sd)  # SD of means
 names(conditions_df_sd_all)[names(conditions_df_sd_all) == 'mean'] <- 'sd'
-conditions_df_sd_all["su "] <- "all"
+conditions_df_sd_all["sub"] <- "all"
 
 conditions_df_all <- merge(conditions_df_mean_all, conditions_df_sd_all)
+
 # put all dataframes together
 plot_df <- bind_rows(plot_df, conditions_df_all)
 
 # save estimated parameters table
 write.csv(
 plot_df, 
-file = file.path(read_path, paste0("all_estimates_gait_parameters_", model_names[[model_n]], ".csv")), 
+file = file.path(read_path, paste0("all_estimates_gait_parameters_", model, ".csv")), 
 row.names=FALSE
 )
 
