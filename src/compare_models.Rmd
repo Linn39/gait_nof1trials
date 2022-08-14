@@ -14,9 +14,9 @@ library(RColorBrewer)
 source("../src/data_loader.R")
 
 # var <- "stride_lengths"
-experiment <- "cauchy_conjugate_left_foot_downsample_5"
+experiment <- "all_left_foot_downsample_5"
 
-for (var in list("stride_lengths")) {  # , "stride_times"
+for (var in list("stride_lengths", "stride_times")) {
   if (var == "stride_lengths") {
     x_label <- "Stride Length [m]"
   } else if (var == "stride_times") {
@@ -25,11 +25,11 @@ for (var in list("stride_lengths")) {  # , "stride_times"
   
   file_names <- c(
     paste0("all_estimates_",var, "_basic.csv"),
-    paste0("all_estimates_",var, "_basic_informed.csv"),
-    paste0("all_estimates_",var, "_basic_time_cov.csv"),
-    paste0("all_estimates_",var, "_basic_time_cov_informed.csv"),
+    paste0("all_estimates_",var, "_basic_informative.csv"),
+    paste0("all_estimates_",var, "_time_cov_basic.csv"),
+    paste0("all_estimates_",var, "_time_cov_basic_informative.csv"),
     paste0("all_estimates_",var, "_AR1.csv"),
-    paste0("all_estimates_",var, "_AR1_informed.csv")
+    paste0("all_estimates_",var, "_AR1_informative.csv")
   )
   model_names <- c(
     "Basic",
