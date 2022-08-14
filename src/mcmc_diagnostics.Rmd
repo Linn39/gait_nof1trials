@@ -11,39 +11,30 @@ Try executing this chunk by clicking the *Run* button within the chunk or by pla
 ```{r}
 library(mcmcplots)
 library(coda)
-print(getwd())
 
 # import r2jags data
-n <- 3
-analyses <- list(
-  "jags_output",  # the standard model
-  "jags_output_left_foot_downsample_2",  # with downsampled stride-by-stride data
-  "cauchy_conjugate_left_foot_downsample_5"
-  )
-data.r2jags <- get(load(file.path("..", "data", "processed", analyses[[n]], "data_r2jags_AR1_stride_lengths_sub_01.RData")))   #
-```
+experiment <- "all_left_foot_downsample_5"
+var <- "ST"
+sub <- "sub_07"
+data.r2jags <- get(load(file.path("..", "data", "processed", experiment, 
+                                  paste0("data_r2jags_AR1_", var, "_", sub, ".RData"))))
 
-Print posterior estimates
-```{r}
+# Print posterior estimates
 print(data.r2jags$BUGSoutput$summary)
-```
 
-```{r}
-effectiveSize(data.r2jags)
-```
-
-```{r}
 # density plot
 denplot(data.r2jags, parms = c("beta", "sigma", "phi"))
-```
-```{r}
+
 # trace plot
 traplot(as.mcmc(data.r2jags), parms = c("beta", "sigma", "phi"))
-# traceplot(data.r2jags, col = c("beta", "sigma", "phi"), xlab="Iterations")
+
 ```
+
 ```{r}
 plot(as.mcmc(data.r2jags))
 ```
+
+Convergence statistic: potential scale reduction factor (PSRF)
 ```{r}
 gelman.diag(as.mcmc(data.r2jags))
 gelman.plot(as.mcmc(data.r2jags))
@@ -71,11 +62,4 @@ Autocorrelation for each parameter illustrate the degree of correlation between 
 #Autocorrelation diagnostic
 autocorr.diag(data.mcmc)
 ```
-
-
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
-
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
-
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
 
