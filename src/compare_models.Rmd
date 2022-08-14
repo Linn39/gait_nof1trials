@@ -65,6 +65,18 @@ for (var in list("stride_lengths", "stride_times")) {
   mean_obs_df <- data.frame(parameter, obs_value)
   all_plot_df <- merge(all_est_df, mean_obs_df, by = "parameter", all.x = TRUE)
   
+  if (var == "stride_times") {
+    # remove subjects whose MCMC chains did not converge
+    drop_idx <- (all_plot_df["model"] == "AR1" & (all_plot_df["sub"] == "sub_07" | all_plot_df["sub"] == "sub_13")) |
+                (all_plot_df["model"] == "AR1 (Informative)" & all_plot_df["sub"] == "sub_13") |
+                ((all_plot_df["model"] == "Time Covariate" | all_plot_df["model"] == "Time Covariate (Informative)") & 
+                   (all_plot_df["sub"] == "sub_02" | 
+                    all_plot_df["sub"] == "sub09" | 
+                    all_plot_df["sub"] == "sub_12" | 
+                    all_plot_df["sub"] == "sub_18"))
+    all_plot_df <- filter(all_plot_df, !drop_idx)
+  }
+  
   # rename for plotting
   all_plot_df <- all_plot_df %>% 
     rename(
