@@ -11,6 +11,7 @@ library(dplyr)
 library(ggplot2)
 library(tidyverse)
 library(reshape2)
+library(colorspace)
 
 source("../src/data_loader.R")
 source("../src/jags_functions.R")
@@ -60,9 +61,15 @@ print(models[[model_n]])
 # read posterior estimations from file
 downsample_n <- 5
 file_name <- "all_estimates_AR1.csv"
-read_path <- file.path("..", "data", "processed", paste0("cauchy_conjugate_left_foot_downsample_", downsample_n))
-file_path <- file.path(read_path, file_name)
-all_estimate_df <- readr::read_csv(file_path, col_names = T, show_col_types = FALSE)
+read_path <- file.path("..", "data", "processed", paste0("all_left_foot_downsample_", downsample_n))
+
+all_estimate_df <- data.frame()
+for (var in c("stride_lengths", "stride_times")) {
+  file_path <- file.path(read_path, paste0("all_estimates_", var, "_", model_names[[model_n]], ".csv"))
+  estimate_df <- readr::read_csv(file_path, col_names = T, show_col_types = FALSE)
+  estimate_df$var <- var
+  all_estimate_df <- bind_rows(all_estimate_df, estimate_df)
+}
 
 ```
 
