@@ -3,7 +3,7 @@ This is a repository for the publication Analyzing Population-Level Trials as N-
 
 ## Installation
 Clone the repository\
-```git clone https://github.com/HIAlab/gait_nof1trials.git```
+```git clone https://github.com/HIAlab/gait_nof1trials.git```\
 ```cd gait_nof1trials```
 
 Save data to:\
