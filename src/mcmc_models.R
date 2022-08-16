@@ -48,7 +48,7 @@ mean[i] <- inprod(beta[],X[i,])
 }
 
   #Priors
-beta[1] ~ dnorm(1.05,5.0E-2)
+beta[1] ~ dnorm(1.05,6.0E-2)
 for(i in 2:ngroups) {
 beta[i] ~ dnorm(0,1.0E-3)
 }
@@ -138,7 +138,7 @@ Omega <- inverse(Sigma)
 
 #Priors
 phi ~ dunif(-1,1)
-beta[1] ~ dnorm(1.05,5.0E-2)
+beta[1] ~ dnorm(1.05,6.0E-2)
 for(i in 2:ngroups) {
 beta[i] ~ dnorm(0,1.0E-3)
 }
