@@ -14,15 +14,13 @@ source("./src/data_loader.R")
 source("./src/jags_functions.R")
 
 #### select a feature/gait parameter (one at a time)
-# feature <- list("stride_lengths", "SL")
-# feature <- list("stride_times", "ST")
 features <- list(
   list("stride_lengths", "SL"),  
   list("stride_times", "ST")
   )
 
 #### select a model
-model_n <- 3 # choose from the list of models
+model_n <- 1 # choose from the list of models
 downsample_step <- 5
 
 model_names <- list(
@@ -98,7 +96,6 @@ for (feature in features) {
     # ggplot(dat_df, aes(y = y, x = condition, fill = fatigue), main=paste(subject, feature[[1]])) + geom_boxplot()
     
     # run jags
-    # run_jags.options(silent.jags=TRUE, silent.runjags=TRUE)
     X <- model.matrix(~condition * fatigue, dat_df)   # X is the design matrix, including intercept
     if (grepl("time_cov", model_names[[model_n]], fixed = TRUE)) {
       X <- append_time(X)  # append the time column to X, apply this only when considering time as covariate
@@ -120,7 +117,6 @@ for (feature in features) {
       )))
     
     # save jags output table
-    # all_estimate_df <- get_jags_table(data.r2jags, subject, feature[[1]])  # use this line when running parallel with foreach
     all_estimate_df <- bind_rows(all_estimate_df, get_jags_table(data.r2jags, subject, feature[[1]]))
   }
   # save estimated parameters table

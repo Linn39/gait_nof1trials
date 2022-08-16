@@ -1,6 +1,6 @@
 ---
-title: "plot results"
-# output: html_notebook
+title: "Plot Results"
+Lin Zhou, August 2022
 ---
 
 # import posterior estimations

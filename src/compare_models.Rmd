@@ -1,6 +1,6 @@
 ---
 title: "Compare Models"
-# output: html_notebook
+Lin Zhou, August 2022
 ---
 
 ```{r, fig.width = 7, fig.height = 8}

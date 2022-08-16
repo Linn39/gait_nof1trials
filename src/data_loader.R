@@ -1,3 +1,5 @@
+#### functions to load and process the data ####
+
 library(dplyr)
 
 #### load gait data

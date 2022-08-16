@@ -1,4 +1,4 @@
-#### Statistics summary and analysis of the data ####
+#### Statistics summary and ANOVA of the data ####
 rm(list=ls())
 
 # load libraries and functions

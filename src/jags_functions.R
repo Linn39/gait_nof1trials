@@ -1,7 +1,8 @@
+#### functions for sampling ####
+
 run_jags <- function(df, X, model_file) {
   # Arrange the data as a list (as required by JAGS)
   # X is the design matrix, including intercept
-  # X <- append_time(X)  # append the time column to X, apply this only when considering time as covariate
   data.list <- with(df, list(y = y, X = X, n = nrow(df), ngroups = ncol(X)))
   
   # Define the nodes (parameters and derivatives) to monitor and the chain parameters.
