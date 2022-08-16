@@ -1,4 +1,5 @@
 #### Statistics summary and analysis of the data ####
+rm(list=ls())
 
 # load libraries and functions
 library(ez)
@@ -30,11 +31,12 @@ loc_df <- loc_df[loc_df$foot == "left", ]
 loc_df <- downsample_rows(loc_df[loc_df$foot == "left", ], downsample_step)
 print(paste("Downsample by", downsample_step))
 print("Summary of data from all subjects after downsampling:")
-print_data_summary(loc_df, features_list[1])
 
 # two-way repeated measures ANOVAA
 results_2_way_anova <- data.frame()
 for (var_name in features_list) {
+  print_data_summary(loc_df, var_name)
+  
   dat_df <- select(loc_df, "var" = var_name, sub, condition, fatigue)
   
   res.aov <- ezANOVA(
