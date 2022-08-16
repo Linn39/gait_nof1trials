@@ -61,7 +61,8 @@ print_subject_summary <- function (df, var) {
       mean = mean(var),
       sd = sd(var),
       min = min(var),
-      max = max(var)
+      max = max(var),
+      median = median(var)
     ) %>%
     as.data.frame(.) %>% 
     mutate_if(is.numeric, round, 4) %>%

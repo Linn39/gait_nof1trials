@@ -19,7 +19,7 @@ features_list <- c(
 loc_df <- load_gait_parameters(folder_path, kw)
 
 # summary statistics of the participants
-sub_characteristics <- c("age", "height(cm)", "weight(kg)", "leg_length(cm)")
+sub_characteristics <- c("age", "height(cm)", "weight(kg)", "leg_length(cm)", "IPAQ_activity_level")
 sub_df <- unique(loc_df[, append(sub_characteristics, "sub")])
 
 for (sub_char in sub_characteristics) {
