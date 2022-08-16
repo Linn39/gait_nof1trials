@@ -1,6 +1,6 @@
 ---
 title: "Plot Results"
-Lin Zhou, August 2022
+author: "Lin Zhou, August 2022"
 ---
 
 # import posterior estimations

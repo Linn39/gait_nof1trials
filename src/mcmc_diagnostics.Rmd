@@ -1,6 +1,6 @@
 ---
 title: "MCMC Diagnostics"
-Lin Zhou, August 2022
+author: "Lin Zhou, August 2022"
 ---
 
 ```{r}
