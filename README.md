@@ -1,12 +1,12 @@
 ## About
 This is a repository for the publication Analyzing Population-Level Trials as N-of-1 Trials: an Application to Gait.
 
-## Installation
-Clone the repository\
+## Getting Started
+Clone the repository:\
 ```git clone https://github.com/HIAlab/gait_nof1trials.git```\
 ```cd gait_nof1trials```
 
-Save data to:\
+Download data [here](../../wiki/Data) and save data to:\
 ```/data/processed/features/```
 
 Retrieve and install packages required for this project:\
