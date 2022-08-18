@@ -16,7 +16,7 @@ Retrieve and install packages required for this project:\
 Get statistical summary of the data:\
 run ```src/main_statistical_summary.R```
 
-Sampling with JAGS:\
+Sampling with JAGS to obtain the posterior estimates:\
 run ```src/main_run_models.R```
 
 Plot results:\
