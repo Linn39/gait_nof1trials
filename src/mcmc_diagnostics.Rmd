@@ -10,7 +10,7 @@ library(coda)
 # import r2jags data
 experiment <- "all_left_foot_downsample_5"
 var <- "ST"
-sub <- "sub_07"
+sub <- "sub_01"
 data.r2jags <- get(load(file.path("..", "data", "processed", experiment, 
                                   paste0("data_r2jags_AR1_", var, "_", sub, ".RData"))))
 
@@ -25,12 +25,12 @@ traplot(as.mcmc(data.r2jags), parms = c("beta", "sigma", "phi"))
 
 ```
 
-```{r}
+```{r, fig.width = 7, fig.height = 7}
 plot(as.mcmc(data.r2jags))
 ```
 
 Convergence statistic: potential scale reduction factor (PSRF)
-```{r}
+```{r, fig.width = 7, fig.height = 5}
 gelman.diag(as.mcmc(data.r2jags))
 gelman.plot(as.mcmc(data.r2jags))
 ```
