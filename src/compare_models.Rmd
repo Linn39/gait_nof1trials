@@ -120,10 +120,16 @@ for (var in list("stride_lengths", "stride_times")) {
                         heights = c(1, 0.9)
                         ) 
   print(fig_combined)
-  print(paste("Betas for", var))
+  
+  # print observed values
+  print(paste("Betas for", var, "from observed data:"))
   for (beta in list(beta1, beta2, beta3, beta4)) {
     print(mean(beta[[var]]))
   }
+  
+  # print mean posterior estimates from the models
+  print(paste("Betas for", var, "from the models:"))
+  print(aggregate(cbind(Mean, SD) ~ Parameter + model + var, data = all_plot_df, mean, na.rm = TRUE))
 }
 
 ```
