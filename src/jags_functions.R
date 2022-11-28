@@ -6,7 +6,10 @@ run_jags <- function(df, X, model_file) {
   data.list <- with(df, list(y = y, X = X, n = nrow(df), ngroups = ncol(X)))
   
   # Define the nodes (parameters and derivatives) to monitor and the chain parameters.
-  if (grepl("AR1", model_file, fixed = TRUE) || grepl("CS", model_file, fixed = TRUE) || grepl("lagged_res", model_file, fixed = TRUE)) {
+  if (grepl("prob", model_file, fixed = TRUE) & grepl("AR1", model_file, fixed = TRUE)) {
+    params <- c("beta", "sigma", "phi", "p1")
+  }
+  else if (grepl("AR1", model_file, fixed = TRUE)) {
     params <- c("beta", "sigma", "phi")
   }
   else {
