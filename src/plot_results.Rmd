@@ -9,6 +9,7 @@ rm(list=ls())
 
 library(dplyr) 
 library(ggplot2)
+library(ggpubr)
 library(tidyverse)
 library(reshape2)
 library(colorspace)
@@ -34,17 +35,23 @@ sub_list <- list(  # for n-of-1 trials, select only one subject!
   "sub_18"
   )
 
+var_list <- list(
+  list("stride_lengths", "SL"),
+  list("stride_times", "ST")
+  )
+
 # # read posterior estimations from file
 model <- "AR1"
 downsample_n <- 5
 read_path <- file.path("..", "data", "processed", paste0("all_left_foot_downsample_", downsample_n))
 
 all_estimate_df <- data.frame()
-for (var in c("stride_lengths", "stride_times")) {
-  file_path <- file.path(read_path, paste0("all_estimates_", var, "_", model, ".csv"))
-  estimate_df <- readr::read_csv(file_path, col_names = T, show_col_types = FALSE)
-  estimate_df$var <- var
-  all_estimate_df <- bind_rows(all_estimate_df, estimate_df)
+for (var in var_list) {
+  for (sub in sub_list) {
+    data.r2jags <- get(load(file.path(read_path, paste0("data_r2jags_AR1_diff_prob_", var[[2]], "_", sub, ".RData"))))
+    all_estimate_df <- bind_rows(all_estimate_df, get_jags_table(data.r2jags, sub, var[[1]]))
+  }
+  
 }
 
 ```
@@ -176,7 +183,6 @@ print(fig_observation2)
 Posterior Predictive Check:
 Combine Posterior with Observations
 ```{r, fig.width = 8, fig.height = 6}
-library("ggpubr")
 
 for (var in list("Stride Length [m]", "Stride Time [s]")) {
   fig_observation_var <- ggplot(all_observations_df[all_observations_df$variable == var,], 
@@ -269,4 +275,64 @@ fig_diff2 <- fig_diff + facet_grid(rows = vars(variable), switch = "y") +
 
 print(fig_diff2)
 
+```
+
+Probability of meaningful change
+
+```{r, fig.width = 7, fig.height = 5}
+fig_posterior_prob <- ggplot(filter(all_estimate_df, parameter == 'p1'), aes(x=as.factor(sub), y=mean, fill=var)) +
+  geom_bar(position=position_dodge(), stat="identity", colour='black') +
+  geom_errorbar(aes(ymin=mean-sd, ymax=mean+sd), width=.2,position=position_dodge(.9)) +
+  ggtitle('posterior probablity of meangful change after fatigue') +
+  # scale_fill_brewer(palette="Spectral") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, vjust=0.6))
+print(fig_posterior_prob)
+
+
+```
+```{r, fig.width = 8, fig.height = 5}
+# plot posterior probabilities
+fig_posterior_prob <- ggplot(filter(all_estimate_df, parameter == 'p1'), aes(x=as.factor(sub), y=mean, fill=var)) +
+  geom_bar(position=position_dodge(), stat="identity", colour='black') +
+  geom_errorbar(aes(ymin=mean-sd, ymax=mean+sd), width=.2,position=position_dodge(.9)) +
+  ggtitle('Posterior probablity of meangful change after fatigue') +
+  ylab("Probability") +
+  # scale_fill_brewer(palette="Spectral") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, vjust=0.6))
+
+# calculate mean changes from the observed data
+diff_fatigue_df <- data.frame()
+for (variable in var_list) {
+  diff_fatigue <- list()
+  for (subject in sub_list) {
+    df <- filter(conditions_df_mean, (var == variable[[1]] & sub == subject))
+    df_spread <- spread(df, key = condition, value = mean)
+    diff_fatigue <- append(diff_fatigue, abs(df_spread$st_fatigue + df_spread$dt_fatigue - df_spread$st_control - df_spread$dt_control)/(df_spread$st_control + df_spread$dt_control))
+  }
+  diff_fatigue_df <- bind_rows(diff_fatigue_df, as.data.frame(diff_fatigue, col.names = sub_list, row.names = variable[[1]]))
+  diff_fatigue_df$var <- rownames(diff_fatigue_df)
+}
+
+diff_fatigue_plot_df <- melt(diff_fatigue_df, id.vars = 'var', variable.name = 'sub')
+
+# plot mean changes from the observed data
+fig_posterior_diff_fatigue <- ggplot(diff_fatigue_plot_df, aes(x=as.factor(sub), y=value, fill = var)) +
+  geom_bar(position=position_dodge(), stat="identity", colour='black') + 
+  geom_hline(yintercept = 0.03, color = 'tomato') +
+  geom_hline(yintercept = 0.02, color = 'cyan4') +
+  ylab("Mean absolute change (%)") +
+  ggtitle('Mean absolute change after fatigue from observed data') +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, vjust=0.6))
+
+# combine the two plots
+fig_combined <- ggarrange(fig_posterior_prob, fig_posterior_diff_fatigue,
+                      labels = c("A", "B"),
+                      ncol = 1, nrow = 2,
+                      heights = c(1, 0.9)
+                      )
+print(fig_combined)
+  
 ```
