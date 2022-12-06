@@ -278,23 +278,37 @@ print(fig_diff2)
 ```
 
 Probability of meaningful change
-```{r, fig.width = 8, fig.height = 3}
+```{r, fig.width = 8, fig.height = 4}
+
+# rename variables for plotting
+all_estimate_df[all_estimate_df == "stride_lengths"] <- "Stride Length"
+all_estimate_df[all_estimate_df == "stride_times"] <- "Stride Time"
+diff_fatigue_plot_df[diff_fatigue_plot_df == "stride_lengths"] <- "Stride Length"
+diff_fatigue_plot_df[diff_fatigue_plot_df == "stride_times"] <- "Stride Time"
+
 # plot posterior probabilities
+h_lines <- data.frame(
+  var = c("Stride Length", "Stride Time"), 
+  threshold = c(0.3, 0.2)
+  )
+
 fig_posterior_prob <- ggplot(filter(all_estimate_df, (parameter == 'p1'))) +
   geom_boxplot(aes(x=sub, group=sub, ymin =mean-3*sd, lower = mean-sd, middle = mean, upper = mean+sd, ymax = mean+3*sd),
                  stat = "identity", width=0.6) +
   geom_point(data = diff_fatigue_plot_df, aes(x=as.factor(sub), y=value * 10, color = var)) +
+  geom_hline(data = h_lines, aes(yintercept = threshold, color = var)) +
   scale_y_continuous(
-    "Probability", 
+    "Probability of Meaningful Change", 
     sec.axis = sec_axis(~ . * 0.10, name = "Mean absolute change (%)")
   ) +
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, vjust=0.6)) +
   facet_grid(rows = vars(var), switch = "y") +
-  theme(strip.background=element_rect( fill="white"),
+  theme(strip.background=element_rect(fill="white"),
         strip.placement = "outside",
         panel.spacing.y = unit(1, "lines")
-        )
+        ) +
+  labs(color='Change Threshold and Values', x = 'Participant')
 
 print(fig_posterior_prob)
 ```
