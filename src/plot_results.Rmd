@@ -278,19 +278,28 @@ print(fig_diff2)
 ```
 
 Probability of meaningful change
-
-```{r, fig.width = 7, fig.height = 5}
-fig_posterior_prob <- ggplot(filter(all_estimate_df, parameter == 'p1'), aes(x=as.factor(sub), y=mean, fill=var)) +
-  geom_bar(position=position_dodge(), stat="identity", colour='black') +
-  geom_errorbar(aes(ymin=mean-sd, ymax=mean+sd), width=.2,position=position_dodge(.9)) +
-  ggtitle('posterior probablity of meangful change after fatigue') +
-  # scale_fill_brewer(palette="Spectral") +
+```{r, fig.width = 8, fig.height = 3}
+# plot posterior probabilities
+fig_posterior_prob <- ggplot(filter(all_estimate_df, (parameter == 'p1'))) +
+  geom_boxplot(aes(x=sub, group=sub, ymin =mean-3*sd, lower = mean-sd, middle = mean, upper = mean+sd, ymax = mean+3*sd),
+                 stat = "identity", width=0.6) +
+  geom_point(data = diff_fatigue_plot_df, aes(x=as.factor(sub), y=value * 10, color = var)) +
+  scale_y_continuous(
+    "Probability", 
+    sec.axis = sec_axis(~ . * 0.10, name = "Mean absolute change (%)")
+  ) +
   theme_bw() +
-  theme(axis.text.x = element_text(angle = 45, vjust=0.6))
+  theme(axis.text.x = element_text(angle = 45, vjust=0.6)) +
+  facet_grid(rows = vars(var), switch = "y") +
+  theme(strip.background=element_rect( fill="white"),
+        strip.placement = "outside",
+        panel.spacing.y = unit(1, "lines")
+        )
+
 print(fig_posterior_prob)
-
-
 ```
+
+
 ```{r, fig.width = 8, fig.height = 5}
 # plot posterior probabilities
 fig_posterior_prob <- ggplot(filter(all_estimate_df, parameter == 'p1')) +
