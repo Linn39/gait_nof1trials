@@ -15,8 +15,8 @@ source("./src/jags_functions.R")
 
 #### select a feature/gait parameter (one at a time)
 features <- list(
-  # list("stride_lengths", "SL"),  
-  list("stride_times", "ST")
+  list("stride_lengths", "SL")
+  # list("stride_times", "ST")
   )
 
 #### select a model
