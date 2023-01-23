@@ -17,7 +17,8 @@ Get statistical summary of the data:\
 run ```src/main_statistical_summary.R```
 
 Sampling with JAGS to obtain the posterior estimates:\
-run ```src/main_run_models.R```
+run ```src/main_run_models.R```\
+Alternatively, posteriors can be directly downloaded [here](../../wiki/Data) for subsequent analyses.
 
 Plot results:\
 run ```src/plot_results.Rmd```
