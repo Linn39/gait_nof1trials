@@ -299,60 +299,21 @@ fig_posterior_prob <- ggplot(filter(all_estimate_df, (parameter == 'p1'))) +
 print(fig_posterior_prob)
 ```
 
+```{r, fig.width = 8, fig.height = 5}
+# compare posterior probability of meaningful change with 
+# absolute change of the posterior estimates (mean values)
 
-```{r, fig.width = 9, fig.height = 5}
-library(svglite)
-# rename variables for plotting
 all_estimate_df[all_estimate_df == "stride_lengths"] <- "Stride Length"
 all_estimate_df[all_estimate_df == "stride_times"] <- "Stride Time"
-diff_fatigue_plot_df[diff_fatigue_plot_df == "stride_lengths"] <- "Stride Length"
-diff_fatigue_plot_df[diff_fatigue_plot_df == "stride_times"] <- "Stride Time"
 
-# plot posterior probabilities
-h_lines <- data.frame(
-  var = c("Stride Length", "Stride Time"), 
-  threshold = c(0.3, 0.2)
-  )
-
-fig_posterior_prob <- ggplot(filter(all_estimate_df, (parameter == 'p1'))) +
-  geom_boxplot(aes(x=sub, group=sub, ymin =mean-3*sd, lower = mean-sd, middle = mean, upper = mean+sd, ymax = mean+3*sd),
-                 stat = "identity", width=0.6) +
-  geom_point(data = diff_fatigue_plot_df, aes(x=sub, y=value * 10, color = var)) +
-  geom_hline(data = h_lines, aes(yintercept = threshold, color = var)) +
-  scale_y_continuous(
-    "Probability of Meaningful Change", 
-    sec.axis = sec_axis(~ . * 0.10, name = "Mean Absolute Change (%)")
-  ) +
-  theme_bw() +
-  theme(axis.text.x = element_text(angle = 45, vjust=0.6),
-        axis.text.y.right = element_text(color = "#009E73")) +
-  facet_grid(rows = vars(var), switch = "y") +
-  # scale_color_brewer(palette="Dark2") +
+fig_posterior_prob <- ggplot(filter(all_estimate_df, (parameter == 'p1'))) + 
+  geom_point(aes(x = sub, y = mean, colour = var), size = 2, shape = 16) +
+  # facet_grid(rows = vars(var), switch = "y") +
   scale_color_manual(values=c("Stride Length" = "#009E73", "Stride Time" = "#E69F00")) +
-  theme(strip.background=element_rect(fill="white"),
-        strip.placement = "outside",
-        panel.spacing.y = unit(1, "lines"),
-        # legend.position = c(0.5, 0.6)
-        ) +
-  labs(color='Change Threshold \n and Values', x = 'Participant')
-
-print(fig_posterior_prob)
-# ggsave(file="test.svg", plot=fig_posterior_prob, width=8, height=4)
-```
-
-
-```{r, fig.width = 8, fig.height = 5}
-# plot posterior probabilities
-fig_posterior_prob <- ggplot(filter(all_estimate_df, parameter == 'p1')) +
-  geom_boxplot(aes(x=as.factor(sub), fill=var, ymin =mean-3*sd, lower = mean-sd, middle = mean, upper = mean+sd, ymax = mean+3*sd),
-                 stat = "identity", width=0.6) +
-  # geom_bar(position=position_dodge(), stat="identity", colour='black') +
-  # geom_errorbar(aes(ymin=mean-sd, ymax=mean+sd), width=.2,position=position_dodge(.9)) +
-  ggtitle('Posterior probablity of meangful change after fatigue') +
-  ylab("Probability") +
-  # scale_fill_brewer(palette="Spectral") +
   theme_bw() +
-  theme(axis.text.x = element_text(angle = 45, vjust=0.6))
+  theme(axis.text.x = element_text(angle = 45, vjust=0.6)) +
+  ylab("Posterior probability") +
+  ggtitle('Posterior probability of meaningful change')
 
 # calculate mean changes from the observed data
 diff_fatigue_df <- data.frame()
@@ -368,13 +329,16 @@ for (variable in var_list) {
 }
 
 diff_fatigue_plot_df <- melt(diff_fatigue_df, id.vars = 'var', variable.name = 'sub')
+diff_fatigue_plot_df$value <- diff_fatigue_plot_df$value * 100    # convert to percentage
+diff_fatigue_plot_df[diff_fatigue_plot_df == "stride_lengths"] <- "Stride Length"
+diff_fatigue_plot_df[diff_fatigue_plot_df == "stride_times"] <- "Stride Time"
 
 # plot mean changes from the posterior estimates
-fig_posterior_diff_fatigue <- ggplot(diff_fatigue_plot_df, aes(x=as.factor(sub), y=value, color = var)) +
-  geom_point() +
-  # geom_bar(position=position_dodge(), stat="identity", colour='black') + 
-  geom_hline(yintercept = 0.03, color = 'tomato') +
-  geom_hline(yintercept = 0.02, color = 'cyan4') +
+fig_posterior_diff_fatigue <- ggplot(diff_fatigue_plot_df, aes(x=sub, y=value, color = var)) +
+  geom_point(size = 2, shape = 16) +
+  scale_color_manual(values=c("Stride Length" = "#009E73", "Stride Time" = "#E69F00")) +
+  geom_hline(yintercept = 3, color = '#009E73') +
+  geom_hline(yintercept = 2, color = '#E69F00') +
   ylab("Mean absolute change (%)") +
   ggtitle('Mean absolute change after fatigue from observed data') +
   theme_bw() +
