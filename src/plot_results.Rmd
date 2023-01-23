@@ -278,6 +278,28 @@ print(fig_diff2)
 ```
 
 Probability of meaningful change
+```{r, fig.width = 9, fig.height = 3}
+# rename variables for plotting
+all_estimate_df[all_estimate_df == "stride_lengths"] <- "Stride Length"
+all_estimate_df[all_estimate_df == "stride_times"] <- "Stride Time"
+
+fig_posterior_prob <- ggplot(filter(all_estimate_df, (parameter == 'p1'))) + 
+  geom_point(aes(x = sub, y = mean, colour = factor(var)), size = 3, shape = 16) +
+  # facet_grid(rows = vars(var), switch = "y") +
+  scale_color_manual(values=c("Stride Length" = "#009E73", "Stride Time" = "#E69F00")) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, vjust=0.6)) +
+  theme(strip.background=element_rect(fill="white"),
+        strip.placement = "outside",
+        panel.spacing.y = unit(1, "lines"),
+        # legend.position = "none"
+        ) +
+  labs(color='Gait Parameter', x = 'Participant', y = 'Probability of Meaningful Change')
+
+print(fig_posterior_prob)
+```
+
+
 ```{r, fig.width = 9, fig.height = 5}
 library(svglite)
 # rename variables for plotting
