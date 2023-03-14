@@ -13,10 +13,10 @@ library(ggpubr)
 library(tidyverse)
 library(reshape2)
 library(colorspace)
-source("../src/data_loader.R")
-source("../src/jags_functions.R")
+source("src/data_loader.R")
+source("src/jags_functions.R")
 
-sub_list <- list(  # for n-of-1 trials, select only one subject!
+sub_list <- list( # for n-of-1 trials, select only one subject!
   "sub_01",
   "sub_02",
   "sub_03",
@@ -40,19 +40,47 @@ var_list <- list(
   list("stride_times", "ST")
   )
 
-# # read posterior estimations from file
-model <- "AR1"
+# # read posterior estimates from file
+model <- "AR1_model_diff_prob"
 downsample_n <- 5
-read_path <- file.path("..", "data", "processed", paste0("all_left_foot_downsample_", downsample_n))
+read_path <- file.path(
+  "data",
+  "processed",
+  paste0("all_left_foot_downsample_", downsample_n)
+)
 
-all_estimate_df <- data.frame()
-for (var in var_list) {
-  for (sub in sub_list) {
-    data.r2jags <- get(load(file.path(read_path, paste0("data_r2jags_AR1_diff_prob_", var[[2]], "_", sub, ".RData"))))
-    all_estimate_df <- bind_rows(all_estimate_df, get_jags_table(data.r2jags, sub, var[[1]]))
+# load posterior estimates
+
+if (file.exists(file.path(  # if summary of the posterior estimates exists, load summary
+  read_path,
+  paste0("all_estimates_", model, ".csv")
+  ))) {
+    all_estimates <- read.csv(
+      file.path(
+        read_path,
+        paste0("all_estimates_", model, ".csv"),
+      row.names = 1
+      ))
+  } else {  # if summary of the posterior estimates doesn't exist, create summary
+    all_estimate_df <- data.frame()
+    for (variable in var_list) {
+      for (sub in sub_list) {
+        data.r2jags <- get(load(file.path(read_path, paste0("data_r2jags_AR1_diff_prob_", variable[[2]], "_", sub, ".RData"))))
+        all_estimate_df <- bind_rows(all_estimate_df, get_jags_table(data.r2jags, sub, variable[[1]]))
+      }
+    }
+
+    # save all posterior estimates into a .csv file
+    write.csv(
+      all_estimate_df,
+      file = file.path(
+        read_path,
+        paste0("all_estimates_", model, ".csv")
+      ),
+      row.names = FALSE
+    )
   }
-  
-}
+
 
 ```
 
@@ -139,7 +167,7 @@ print(fig_posterior2)
 
 Summary of the observed data
 ```{r, fig.width = 7, fig.height = 5}
-all_observations_df <- read_csv(file.path("..", "data", "processed", "features", "df_all.csv"), show_col_types = FALSE)
+all_observations_df <- read_csv(file.path("data", "processed", "features", "df_all.csv"), show_col_types = FALSE)
 all_observations_df <- downsample_rows(all_observations_df[all_observations_df$foot == "left", ], downsample_n) # reduce data size to match the data used for JAGS models
 all_observations_df["conditions"] <- paste(all_observations_df$condition, all_observations_df$fatigue, sep="_")
 
