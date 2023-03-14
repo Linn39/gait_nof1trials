@@ -3,6 +3,9 @@
 .RData
 .Ruserdata
 
+# exclude json files
+*.json
+
 # exclude vscode 
 .vscode/
 
@@ -10,7 +13,7 @@
 .DS_Store
 
 # exclude data from source control by default
-/data/
+/data*/
 
 # exclude reference documents for the project 
 /references/
