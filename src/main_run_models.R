@@ -15,7 +15,7 @@ source("./src/jags_functions.R")
 
 #### select a feature/gait parameter (one at a time)
 features <- list(
-  # list("stride_lengths", "SL"),  
+  # list("stride_lengths", "SL")
   list("stride_times", "ST")
   )
 
@@ -34,22 +34,22 @@ model_names <- list(
 )
 
 sub_list <- list(
-  "sub_01"
-  # "sub_02",
-  # "sub_03",
-  # "sub_05",
-  # "sub_06",
-  # "sub_07",
-  # "sub_08",
-  # "sub_09",
-  # "sub_10",
-  # "sub_11",
-  # "sub_12",
-  # "sub_13",
-  # "sub_14",
-  # "sub_15",
-  # "sub_17",
-  # "sub_18"
+  "sub_01",
+  "sub_02",
+  "sub_03",
+  "sub_05",
+  "sub_06",
+  "sub_07",
+  "sub_08",
+  "sub_09",
+  "sub_10",
+  "sub_11",
+  "sub_12",
+  "sub_13",
+  "sub_14",
+  "sub_15",
+  "sub_17",
+  "sub_18"
   )
 
 # read data from file
