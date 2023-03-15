@@ -8,9 +8,7 @@ author: "Lin Zhou, August 2022"
 rm(list=ls())
 
 suppressMessages(library(dplyr))
-suppressMessages(library(dplyr))
 library(ggplot2)
-library(ggpubr)
 library(ggpubr)
 library(tidyverse)
 library(reshape2)
@@ -42,7 +40,7 @@ var_list <- list(
   list("stride_times", "ST")
   )
 
-model <- "AR1_model_diff_prob"
+model <- "AR1_diff_prob"
 
 downsample_n <- 5
 read_path <- file.path(

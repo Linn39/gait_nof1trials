@@ -11,8 +11,8 @@ library(coda)
 experiment <- "all_left_foot_downsample_5"
 var <- "ST"
 sub <- "sub_01"
-data.r2jags <- get(load(file.path("..", "data", "processed", experiment, 
-                                  paste0("data_r2jags_AR1_model_diff_prob_", var, "_", sub, ".RData"))))
+data.r2jags <- get(load(file.path("data", "processed", experiment,
+                                  paste0("data_r2jags_AR1_diff_prob_", var, "_", sub, ".RData"))))
 
 # Print posterior estimates
 print(data.r2jags$BUGSoutput$summary)
