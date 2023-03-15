@@ -49,6 +49,19 @@ print_data_summary <- function (df, var) {
     as.data.frame(.) %>% 
     mutate_if(is.numeric, round, 4) %>%
     print()
+  
+  # print number of stride per person
+  print("Number of strides per person under each walking condition:")
+  count_per_sub_df <- loc_df %>% count(sub, fatigue, condition)
+  count_per_sub_df  %>%
+    group_by(fatigue, condition) %>%
+    summarize(
+      mean = mean(n),
+      sd = sd(n)
+    ) %>%
+    as.data.frame(.) %>% 
+    mutate_if(is.numeric, round, 4) %>%
+    print()
 }
 
 print_subject_summary <- function (df, var) {
