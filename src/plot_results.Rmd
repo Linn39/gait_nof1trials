@@ -16,7 +16,7 @@ library(colorspace)
 source("src/data_loader.R")
 source("src/jags_functions.R")
 
-sub_list <- list( # for n-of-1 trials, select only one subject!
+sub_list <- list(
   "sub_01",
   "sub_02",
   "sub_03",
@@ -40,8 +40,8 @@ var_list <- list(
   list("stride_times", "ST")
   )
 
-# # read posterior estimates from file
 model <- "AR1_model_diff_prob"
+
 downsample_n <- 5
 read_path <- file.path(
   "data",
@@ -49,18 +49,16 @@ read_path <- file.path(
   paste0("all_left_foot_downsample_", downsample_n)
 )
 
-# load posterior estimates
-
+#### load posterior estimates
 if (file.exists(file.path(  # if summary of the posterior estimates exists, load summary
   read_path,
   paste0("all_estimates_", model, ".csv")
   ))) {
-    all_estimates <- read.csv(
+    all_estimate_df <- read.csv(
       file.path(
         read_path,
-        paste0("all_estimates_", model, ".csv"),
-      row.names = 1
-      ))
+        paste0("all_estimates_", model, ".csv"))
+      )
   } else {  # if summary of the posterior estimates doesn't exist, create summary
     all_estimate_df <- data.frame()
     for (variable in var_list) {
@@ -80,7 +78,6 @@ if (file.exists(file.path(  # if summary of the posterior estimates exists, load
       row.names = FALSE
     )
   }
-
 
 ```
 
@@ -353,7 +350,7 @@ for (variable in var_list) {
     diff_fatigue <- append(diff_fatigue, abs(df_spread$st_fatigue + df_spread$dt_fatigue - df_spread$st_control - df_spread$dt_control)/(df_spread$st_control + df_spread$dt_control))
   }
   diff_fatigue_df <- bind_rows(diff_fatigue_df, as.data.frame(diff_fatigue, col.names = sub_list, row.names = variable[[1]]))
-  diff_fatigue_df$var <- rownames(diff_fatigue_df)
+  diff_fatigue_df["var"] <- rownames(diff_fatigue_df)
 }
 
 diff_fatigue_plot_df <- melt(diff_fatigue_df, id.vars = 'var', variable.name = 'sub')
@@ -378,6 +375,6 @@ fig_combined <- ggarrange(fig_posterior_prob, fig_posterior_diff_fatigue,
                       ncol = 1, nrow = 2,
                       heights = c(1, 0.9)
                       )
-print(fig_combined)
+print(fig_posterior_prob)
   
 ```
