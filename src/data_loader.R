@@ -2,13 +2,38 @@
 
 library(dplyr)
 
+#### put data from all subjects and runs together, save as .csv
+all_df <- data.frame()
+collect_all_data <- function (read_path, save_path, subs, runs) {
+  for (sub in sub_list) {
+    for (run in runs) {
+      for (foot in list(list("left_foot", "LF"), list("right_foot", "RF"))) {
+        df <- readr::read_csv(
+          file.path(read_path, sub, run, paste0(foot[1], "_core_params_py_n.csv")), 
+          col_names = T, 
+          show_col_types = FALSE
+        ) 
+        df["sub"] <- sub
+        df["run"] <- run
+        df["foot"] <- foot[2]
+        all_df <- bind_rows(all_df, df)
+      }
+    }
+  }
+  if (!dir.exists(save_path)){
+    dir.create(save_path, recursive = TRUE)
+  }
+  write.csv(all_df, file.path(save_path, "df_all_strides.csv"))
+}
+
+
 #### load gait data
-load_gait_parameters <- function (folder_path, keyword) {
+load_gait_parameters <- function(read_path, keyword) {
   
   #### first find file name by keyword ####
   file_path <- c()
   kw_fn_list <- list()  # keyword - file name pairs
-  kw_fn_list[[ "LFRF_all_strides" ]] <- "df_all.csv"
+  kw_fn_list[[ "LFRF_all_strides" ]] <- "df_all_strides.csv"
   
   # look up file names
   if (keyword %in% names(kw_fn_list)) {
@@ -19,10 +44,12 @@ load_gait_parameters <- function (folder_path, keyword) {
   }
   
   #### then load the data ####
-if (keyword == "LFRF_all_strides") {
-    folder_path <- file.path("data/processed", "features")
-    data_path <- file.path(folder_path, file_name)
-    dat_df <- readr::read_csv(data_path, col_names = T, show_col_types = FALSE)  
+  if (keyword == "LFRF_all_strides") {
+    dat_df <- readr::read_csv(
+      file.path(read_path, file_name),
+      col_names = T, 
+      show_col_types = FALSE
+    )  
     
     # remove outlier strides
     dat_df <- dat_df[(dat_df$is_outlier == FALSE) & 
