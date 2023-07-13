@@ -16,6 +16,7 @@ features_list <- c(
 )
 
 # read data from file
+folder_path <- "data/processed/features"
 loc_df <- load_gait_parameters(folder_path, kw)
 
 # summary statistics of the participants
@@ -52,5 +53,6 @@ for (var_name in features_list) {
   anova_res$variable <- var_name
   results_2_way_anova <- dplyr::bind_rows(results_2_way_anova, anova_res)
 }
+options(width=1000)  # set the width of the console to display all columns
 print("ANOVA Summary:")
 print(results_2_way_anova)
