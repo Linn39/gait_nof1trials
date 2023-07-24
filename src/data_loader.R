@@ -3,8 +3,8 @@
 library(dplyr)
 
 #### put data from all subjects and runs together, save as .csv
-all_df <- data.frame()
 collect_all_data <- function (read_path, save_path, subs, runs) {
+  all_df <- data.frame()
   for (sub in sub_list) {
     for (run in runs) {
       for (foot in list(list("left_foot", "LF"), list("right_foot", "RF"))) {
