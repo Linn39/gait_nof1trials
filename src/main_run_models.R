@@ -1,5 +1,6 @@
 rm(list = ls())
 
+library(rjson)
 library(tictoc)
 library(ggplot2)
 library(R2jags)
@@ -24,13 +25,13 @@ model_n <- 7 # choose from the list of models
 downsample_step <- 5
 
 model_names <- list(
-  "basic",
-  "basic_informative",
-  "time_cov_basic",
-  "time_cov_basic_informative",
-  "AR1",
-  "AR1_informative",
-  "AR1_model_diff_prob"
+  "basic",                      # 1
+  "basic_informative",          # 2
+  "time_cov_basic",             # 3
+  "time_cov_basic_informative", # 4
+  "AR1",                        # 5
+  "AR1_informative",            # 6
+  "AR1_model_diff_prob"         # 7
 )
 
 sub_list <- list(
@@ -53,6 +54,10 @@ sub_list <- list(
   )
 
 # read data from file
+# read path from path.json file
+paths <- fromJSON(file = "path.json")
+folder_path <- file.path(paths$data, "processed", "features")
+
 loc_df <- load_gait_parameters(folder_path, 'LFRF_all_strides')
 loc_df <- loc_df[loc_df$foot == "left", ]
 loc_df <- downsample_rows(loc_df[loc_df$foot == "left", ], downsample_step) # reduce data size
@@ -65,7 +70,7 @@ loc_df$condition[loc_df$condition == "st"] <- 0
 loc_df$condition[loc_df$condition == "dt"] <- 1
 
 # loop through all subjects and all features
-output_folder <- file.path("data", "processed", paste0("all_left_foot_downsample_", as.character(downsample_step)))
+output_folder <- file.path("data", "processed", paste0("test_left_foot_downsample_", as.character(downsample_step)))
 dir.create(output_folder, showWarnings = FALSE)
 
 for (feature in features) {
@@ -76,7 +81,7 @@ for (feature in features) {
   } else {
     file_model_name <- model_names[[model_n]]
   }
-  if (grepl("informative", file_model_name, fixed = TRUE)) {
+  if (grepl("informative|prob", file_model_name)) {
     model_file <- paste0(file_model_name, "_", feature[[2]], ".txt")
   } else {
     model_file <- paste0(file_model_name, ".txt")
