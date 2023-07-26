@@ -118,15 +118,13 @@ sigma <- z/sqrt(chSq)    # prior for sigma; cauchy = normal/sqrt(chi^2)
 z ~ dnorm(0, 0.16)I(0,)  # half-normal distribution with only positive part, Cauchy scale = 2.5
 chSq ~ dgamma(0.5, 0.5)  # chi^2 with 1 d.f.
 sigma2 = pow(sigma,2)
-#tau.cor <- tau #* (1- phi*phi)
 
-# Probability effects of fatigue
-stControl <- beta[1]
-dtControl <- beta[1] + beta[2]
-stFatigue <- beta[1] + beta[3]
-dtFatigue <- beta[1] + beta[2] + beta[3] + beta[4]
-diff <- abs(stControl + dtControl - stFatigue - dtFatigue) - sum(stControl, dtControl) * 0.03
-p_fatigue <- step(diff)
+# Probability effects of fatigue and cognitive task
+threshold <- 0.03    # threshold for meaningful effect
+diff_fatigue <- abs(beta[3] + 0.5*beta[4]) / (beta[1] + 0.5*beta[2])
+diff_cognitive_task <- abs(beta[2] + 0.5*beta[4]) / (beta[1] + 0.5*beta[3])
+p_fatigue <- step(diff_fatigue - threshold)    # probability of larger than the threshold
+p_cognitive_task <- step(diff_cognitive_task - threshold)
 }
 "
 
@@ -154,15 +152,13 @@ sigma <- z/sqrt(chSq)    # prior for sigma; cauchy = normal/sqrt(chi^2)
 z ~ dnorm(0, 0.16)I(0,)  # half-normal distribution with only positive part, Cauchy scale = 2.5
 chSq ~ dgamma(0.5, 0.5)  # chi^2 with 1 d.f.
 sigma2 = pow(sigma,2)
-#tau.cor <- tau #* (1- phi*phi)
 
-# Probability effects of fatigue
-stControl <- beta[1]
-dtControl <- beta[1] + beta[2]
-stFatigue <- beta[1] + beta[3]
-dtFatigue <- beta[1] + beta[2] + beta[3] + beta[4]
-diff <- abs(stControl + dtControl - stFatigue - dtFatigue) - sum(stControl, dtControl) * 0.02
-p_fatigue <- step(diff)
+# Probability effects of fatigue and cognitive task
+threshold <- 0.02    # threshold for meaningful effect
+diff_fatigue <- abs(beta[3] + 0.5*beta[4]) / (beta[1] + 0.5*beta[2])
+diff_cognitive_task <- abs(beta[2] + 0.5*beta[4]) / (beta[1] + 0.5*beta[3])
+p_fatigue <- step(diff_fatigue - threshold)    # probability of larger than the threshold
+p_cognitive_task <- step(diff_cognitive_task - threshold)
 }
 "
 
