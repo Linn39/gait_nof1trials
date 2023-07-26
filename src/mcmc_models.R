@@ -121,10 +121,10 @@ sigma2 = pow(sigma,2)
 
 # Probability effects of fatigue and cognitive task
 threshold <- 0.03    # threshold for meaningful effect
-diff_fatigue <- abs(beta[3] + 0.5*beta[4]) / (beta[1] + 0.5*beta[2])
-diff_cognitive_task <- abs(beta[2] + 0.5*beta[4]) / (beta[1] + 0.5*beta[3])
-p_fatigue <- step(diff_fatigue - threshold)    # probability of larger than the threshold
-p_cognitive_task <- step(diff_cognitive_task - threshold)
+diff_fatigue <- abs(beta[3] + 0.5*beta[4]) - (beta[1] + 0.5*beta[2])*threshold
+diff_cognitive_task <- abs(beta[2] + 0.5*beta[4]) - (beta[1] + 0.5*beta[3])*threshold
+p_fatigue <- step(diff_fatigue)    # probability of larger than the threshold
+p_cognitive_task <- step(diff_cognitive_task)
 }
 "
 
@@ -155,10 +155,10 @@ sigma2 = pow(sigma,2)
 
 # Probability effects of fatigue and cognitive task
 threshold <- 0.02    # threshold for meaningful effect
-diff_fatigue <- abs(beta[3] + 0.5*beta[4]) / (beta[1] + 0.5*beta[2])
-diff_cognitive_task <- abs(beta[2] + 0.5*beta[4]) / (beta[1] + 0.5*beta[3])
-p_fatigue <- step(diff_fatigue - threshold)    # probability of larger than the threshold
-p_cognitive_task <- step(diff_cognitive_task - threshold)
+diff_fatigue <- abs(beta[3] + 0.5*beta[4]) - (beta[1] + 0.5*beta[2])*threshold
+diff_cognitive_task <- abs(beta[2] + 0.5*beta[4]) - (beta[1] + 0.5*beta[3])*threshold
+p_fatigue <- step(diff_fatigue)    # probability of larger than the threshold
+p_cognitive_task <- step(diff_cognitive_task)
 }
 "
 
