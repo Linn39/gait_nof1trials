@@ -17,19 +17,19 @@ features_list <- c(
 
 # read data from file
 folder_path <- "data/processed/features"
-loc_df <- load_gait_parameters(folder_path, kw)
+full_df <- load_gait_parameters(folder_path, kw)
 
 # summary statistics of the participants
 sub_characteristics <- c("age", "height(cm)", "weight(kg)", "leg_length(cm)")
-sub_df <- unique(loc_df[, append(sub_characteristics, "sub")])
+sub_df <- unique(full_df[, append(sub_characteristics, "sub")])
 
 for (sub_char in sub_characteristics) {
   print_subject_summary(sub_df, sub_char)
 }
 
 # summary statistics of the data
-loc_df <- loc_df[loc_df$foot == "left", ]
-loc_df <- downsample_rows(loc_df[loc_df$foot == "left", ], downsample_step)
+# left_df <- full_df[full_df$foot == "left", ]
+df <- downsample_rows(full_df[full_df$foot == "left", ], downsample_step, plot = FALSE)
 print(paste("Downsample by", downsample_step))
 print("Summary of data from all subjects after downsampling:")
 
@@ -37,10 +37,10 @@ print("Summary of data from all subjects after downsampling:")
 results_2_way_anova <- data.frame()
 
 for (var_name in features_list) {
-  print_data_summary(loc_df, var_name)
-  colnames(loc_df)[colnames(loc_df) %in% c("height(cm)", "weight(kg)")] <- c("height_cm", "weight_kg") # rename columns
+  print_data_summary(df, var_name)
+  colnames(df)[colnames(df) %in% c("height(cm)", "weight(kg)")] <- c("height_cm", "weight_kg") # rename columns
 
-  dat_df <- select(loc_df, "var" = var_name, "sub", "condition", "fatigue", "age", "sex", "height_cm", "weight_kg")
+  dat_df <- select(df, "var" = var_name, "sub", "condition", "fatigue", "age", "sex", "height_cm", "weight_kg")
 
   res_aov <- ezANOVA(
     data = dat_df,
