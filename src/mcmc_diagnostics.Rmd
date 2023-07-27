@@ -8,20 +8,29 @@ library(mcmcplots)
 library(coda)
 
 # import r2jags data
-experiment <- "all_left_foot_downsample_5"
+experiment <- "test_left_foot_downsample_5"
+model_name <- "AR1_model_diff_prob"
 var <- "ST"
 sub <- "sub_01"
-data.r2jags <- get(load(file.path("data", "processed", experiment,
-                                  paste0("data_r2jags_AR1_diff_prob_", var, "_", sub, ".RData"))))
+
+# define output directory
+save_dir <- file.path("data", "figures", "mcmc_diagnostics", experiment)
+if (!dir.exists(save_dir)) dir.create(save_dir, recursive = TRUE)
+
+data.r2jags <- get(load(file.path(
+    "data", "processed", experiment,
+    paste0("data_r2jags_", model_name, "_", var, "_", sub, ".RData")
+)))
 
 # Print posterior estimates
+options(width = 1000) # set the width of the console to display all columns
 print(data.r2jags$BUGSoutput$summary)
 
 # density plot
-denplot(data.r2jags, parms = c("beta", "sigma", "phi", "p1"))
+den_plot <- denplot(data.r2jags, parms = c("beta", "sigma", "phi", "p_fatigue", "p_cognitive_task"))
 
 # trace plot
-traplot(as.mcmc(data.r2jags), parms = c("beta", "sigma", "phi", "p1"))
+tra_plot <- traplot(as.mcmc(data.r2jags), parms = c("beta", "sigma", "phi", "p_fatigue", "p_cognitive_task"))
 
 ```
 
@@ -38,7 +47,7 @@ Raftery diagnostics: require no more than N samples to reach the specified level
 You can interpret this test by looking at the feasibility of convergence. Generally speaking, you want for the total number of needed iterations to be less than 100,000. Any more than 100,000 gives cause for concern.
 https://rdrr.io/cran/coda/man/raftery.diag.html
 ```{r}
-data.mcmc = as.mcmc(data.r2jags)
+data.mcmc <- as.mcmc(data.r2jags)
 
 # raftery diagnostics
 raftery.diag(data.mcmc)
@@ -54,7 +63,7 @@ geweke.plot(data.mcmc)
 
 Autocorrelation for each parameter illustrate the degree of correlation between MCMC samples separated by different lags. For example, a lag of 0 represents the degree of correlation between each MCMC sample and itself (obviously this will be a correlation of 1). A lag of 1 represents the degree of correlation between each MCMC sample and the next sample along the chain and so on. In order to be able to generate unbiased estimates of parameters, the MCMC samples should be independent (uncorrelated).
 ```{r}
-#Autocorrelation diagnostic
+# Autocorrelation diagnostic
 autocorr.diag(data.mcmc)
 ```
 
