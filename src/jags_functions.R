@@ -7,7 +7,7 @@ run_jags <- function(df, X, model_file) {
   
   # Define the nodes (parameters and derivatives) to monitor and the chain parameters.
   if (grepl("prob", model_file, fixed = TRUE) & grepl("AR1", model_file, fixed = TRUE)) {
-    params <- c("beta", "sigma", "phi", "p1")
+    params <- c("beta", "sigma", "phi", "p_fatigue", "p_cognitive_task")
   }
   else if (grepl("AR1", model_file, fixed = TRUE)) {
     params <- c("beta", "sigma", "phi")
