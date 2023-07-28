@@ -346,43 +346,56 @@ ggsave(
     filename = file.path(save_fig_dir, paste0("heatmap_diff_SL_ST_AR1.pdf")),
     plot = fig_diff2,
     width = 8,
-    height = 6,
+    height = 4.5,
     # units = "in",
     dpi = 300
 )
 
 #### Probability of meaningful change
 # rename variables for plotting
-all_estimate_df[all_estimate_df == "stride_lengths"] <- "Stride Length"
-all_estimate_df[all_estimate_df == "stride_times"] <- "Stride Time"
+posterior_prob_df <- filter(all_estimate_df, (parameter %in% c("p_fatigue", "p_cognitive_task")))
+posterior_prob_df[posterior_prob_df == "stride_lengths"] <- "Stride Length"
+posterior_prob_df[posterior_prob_df == "stride_times"] <- "Stride Time"
+posterior_prob_df[posterior_prob_df == "p_fatigue"] <- "Fatigue"
+posterior_prob_df[posterior_prob_df == "p_cognitive_task"] <- "Cognitive Task"
 
-for (cond in c("fatigue", "cognitive_task")) {
-    fig_posterior_prob <- ggplot(filter(all_estimate_df, (parameter == paste0("p_", cond)))) +
-        geom_point(aes(x = sub, y = mean, colour = factor(var)), size = 3, shape = 16) +
-        # facet_grid(rows = vars(var), switch = "y") +
-        scale_color_manual(values = c("Stride Length" = "#009E73", "Stride Time" = "#E69F00")) +
-        theme_bw() +
-        theme(axis.text.x = element_text(angle = 45, vjust = 0.6)) +
-        theme(
-            strip.background = element_rect(fill = "white"),
-            strip.placement = "outside",
-            panel.spacing.y = unit(1, "lines"),
-            # legend.position = "none"
-        ) +
-        labs(color = "Gait Parameter", x = "Participant", y = "Posterior Probability of Meaningful Change")
+fig_posterior_prob <- ggplot(posterior_prob_df) +
+    geom_point(aes(x = sub, y = mean, colour = factor(var)), size = 3, shape = 16) +
+    # facet_grid(rows = vars(var), switch = "y") +
+    scale_color_manual(values = c("Stride Length" = "#009E73", "Stride Time" = "#E69F00")) +
+    theme_bw() +
+    theme(axis.text.x = element_text(angle = 45, vjust = 0.6)) +
+    theme(
+        strip.background = element_rect(fill = "white"),
+        strip.placement = "outside",
+        panel.spacing.y = unit(1, "lines"),
+        # legend.position = "none"
+    ) +
+    labs(color = "Gait Parameter", x = "Participant", y = "Posterior Probability of Meaningful Change")
 
-    # save figure
-    ggsave(
-        filename = file.path(save_fig_dir, paste0("posterior_prob_meaningful_change_", cond, "_AR1.pdf")),
-        plot = fig_posterior_prob,
-        width = 8,
-        height = 4,
-        # units = "in",
-        dpi = 300
+fig_posterior_prob2 <- fig_posterior_prob + facet_wrap(
+    vars(parameter),
+    nrow = 2,
+    strip.position = "left",
+    scales = "free_y"
+) +
+    theme(
+        strip.background = element_rect(fill = "white"),
+        strip.placement = "outside",
+        panel.spacing.y = unit(1, "lines")
     )
-}
 
-# compare posterior probability of meaningful change with
+# save figure
+ggsave(
+    filename = file.path(save_fig_dir, "posterior_prob_meaningful_change_AR1.pdf"),
+    plot = fig_posterior_prob2,
+    width = 8,
+    height = 4,
+    # units = "in",
+    dpi = 300
+)
+
+#### compare posterior probability of meaningful change with
 # absolute change of the posterior estimates (mean values)
 
 all_estimate_df[all_estimate_df == "stride_lengths"] <- "Stride Length"
