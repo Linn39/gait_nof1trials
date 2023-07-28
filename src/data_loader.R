@@ -103,8 +103,7 @@ plot_over_time <- function(df, var) {
       )
     ) +
       geom_point(size = 3) +
-      xlab("Sample Number") +
-      ylab(var)
+      labs(title = paste0("Data points ", sub), x = "Sample Number", y = var)
 
     # save the plot
     save_dir <- file.path("data", "figures", "dist_over_time")
@@ -114,8 +113,8 @@ plot_over_time <- function(df, var) {
     ggsave(
       file.path(save_dir, paste0("over_time_", var, "_", sub, ".pdf")),
       plot = scatter_plot,
-      width = 10,
-      height = 5
+      width = 6,
+      height = 3
     )
   }
 }
@@ -157,9 +156,11 @@ downsample_rows <- function(df, step, plot = FALSE) {
 
         # rename the column to "var" for convenience
         names(sub_df)[names(sub_df) == col] <- "var"
+
         # calculate group means
         group_means <- ddply(sub_df, .(source), summarise, var.mean = mean(var))
-        # create the plot using ggplot
+
+        # create the plot
         dist_plot <- ggplot(sub_df, aes(x = var, fill = source)) +
           geom_density(alpha = 0.5) +
           geom_vline(
@@ -175,7 +176,7 @@ downsample_rows <- function(df, step, plot = FALSE) {
         }
         ggsave(
           file.path(save_dir, paste0("dist_downsample_", col, "_", sub, ".pdf")),
-          plot = dist_plot, width = 6, height = 4
+          plot = dist_plot, width = 4, height = 3
         )
 
         # restore the column name

@@ -48,7 +48,7 @@ for (var_name in features_list) {
     data = dat_df,
     dv = .(var),
     wid = .(sub),
-    within = .(condition, fatigue), 
+    within = .(condition, fatigue),
     within_covariates = .(age, height_cm, weight_kg),
     detailed = T,
     type = 2
