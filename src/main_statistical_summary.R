@@ -28,8 +28,10 @@ for (sub_char in sub_characteristics) {
 }
 
 # summary statistics of the data
-# left_df <- full_df[full_df$foot == "left", ]
-df <- downsample_rows(full_df[full_df$foot == "left", ], downsample_step, plot = FALSE)
+df <- downsample_rows(
+  full_df[full_df$foot == "left", ], downsample_step,
+  plot = FALSE
+)
 print(paste("Downsample by", downsample_step))
 print("Summary of data from all subjects after downsampling:")
 
@@ -40,9 +42,15 @@ for (var_name in features_list) {
   print_data_summary(df, var_name)
   plot_over_time(df, var_name)
 
-  colnames(df)[colnames(df) %in% c("height(cm)", "weight(kg)")] <- c("height_cm", "weight_kg") # rename columns
+  colnames(df)[
+    colnames(df) %in% c("height(cm)", "weight(kg)")
+  ] <- c("height_cm", "weight_kg") # rename columns
 
-  dat_df <- select(df, "var" = var_name, "sub", "condition", "fatigue", "age", "sex", "height_cm", "weight_kg")
+  dat_df <- select(
+    df,
+    "var" = var_name,
+    "sub", "condition", "fatigue", "age", "sex", "height_cm", "weight_kg"
+  )
 
   res_aov <- ezANOVA(
     data = dat_df,
@@ -50,7 +58,7 @@ for (var_name in features_list) {
     wid = .(sub),
     within = .(condition, fatigue),
     within_covariates = .(age, height_cm, weight_kg),
-    detailed = T,
+    detailed = TRUE,
     type = 2
   )
 

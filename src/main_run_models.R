@@ -6,7 +6,7 @@ library(ggplot2)
 library(R2jags)
 library(lattice)
 library(knitr)
-library(dplyr) 
+library(dplyr)
 library(tidyr)
 library(foreach)
 library(doParallel)
@@ -18,20 +18,20 @@ source("./src/jags_functions.R")
 features <- list(
   list("stride_lengths", "SL"),
   list("stride_times", "ST")
-  )
+)
 
 #### select a model
 model_n <- 7 # choose from the list of models
 downsample_step <- 5
 
 model_names <- list(
-  "basic",                      # 1
-  "basic_informative",          # 2
-  "time_cov_basic",             # 3
+  "basic", # 1
+  "basic_informative", # 2
+  "time_cov_basic", # 3
   "time_cov_basic_informative", # 4
-  "AR1",                        # 5
-  "AR1_informative",            # 6
-  "AR1_diff_prob"               # 7
+  "AR1", # 5
+  "AR1_informative", # 6
+  "AR1_diff_prob" # 7
 )
 
 sub_list <- list(
@@ -51,16 +51,18 @@ sub_list <- list(
   "sub_15",
   "sub_17",
   "sub_18"
-  )
+)
 
 # read data from file
 # read path from path.json file
 paths <- fromJSON(file = "path.json")
 folder_path <- file.path(paths$data, "processed", "features")
 
-loc_df <- load_gait_parameters(folder_path, 'LFRF_all_strides')
+loc_df <- load_gait_parameters(folder_path, "LFRF_all_strides")
 loc_df <- loc_df[loc_df$foot == "left", ]
-loc_df <- downsample_rows(loc_df[loc_df$foot == "left", ], downsample_step) # reduce data size
+loc_df <- downsample_rows(
+  loc_df[loc_df$foot == "left", ], downsample_step
+) # reduce data size
 print(paste("Downsample by", downsample_step))
 
 # rename the label columns to 1 and 0
@@ -70,14 +72,23 @@ loc_df$condition[loc_df$condition == "st"] <- 0
 loc_df$condition[loc_df$condition == "dt"] <- 1
 
 # loop through all subjects and all features
-output_folder <- file.path("data", "processed", paste0("test_left_foot_downsample_", as.character(downsample_step)))
+output_folder <- file.path(
+  "data",
+  "processed",
+  paste0(
+    "test_left_foot_downsample_",
+    as.character(downsample_step)
+  )
+)
 dir.create(output_folder, showWarnings = FALSE)
 
 for (feature in features) {
   all_estimate_df <- data.frame()
   print(feature[[1]])
   if (grepl("time_cov", model_names[[model_n]], fixed = TRUE)) {
-    file_model_name <- substring(model_names[[model_n]], 10)  # time_cov also uses the basic model
+    file_model_name <- substring(
+      model_names[[model_n]], 10
+    ) # time_cov also uses the basic model
   } else {
     file_model_name <- model_names[[model_n]]
   }
@@ -87,24 +98,31 @@ for (feature in features) {
     model_file <- paste0(file_model_name, ".txt")
   }
   print(model_names[[model_n]])
-  
+
   for (subject in sub_list) {
     print(subject)
     # filter the dataframe
     dat_df <- filter(loc_df, sub == subject)
     dat_df <- dat_df[, c(feature[[1]], "fatigue", "condition")]
     print_data_summary(dat_df, feature[[1]])
-    dat_df <- rename(dat_df,c('y' = feature[[1]]))
+    dat_df <- rename(dat_df, c("y" = feature[[1]]))
     print(paste("Current sample size:", nrow(dat_df)))
-    
+
     # # viasualizing the data (optional)
-    # with(dat_df, interaction.plot(fatigue, condition, y, main=paste(subject, feature[[1]])))
-    # ggplot(dat_df, aes(y = y, x = condition, fill = fatigue), main=paste(subject, feature[[1]])) + geom_boxplot()
-    
+    # with(dat_df, interaction.plot(
+    # fatigue, condition, y, main=paste(subject, feature[[1]])))
+    # ggplot(dat_df, aes(y = y, x = condition, fill = fatigue),
+    # main=paste(subject, feature[[1]])) +
+    # geom_boxplot()
+
     # run jags
-    X <- model.matrix(~condition * fatigue, dat_df)   # X is the design matrix, including intercept
+    X <- model.matrix(
+      ~ condition * fatigue, dat_df
+    ) # X is the design matrix, including intercept
     if (grepl("time_cov", model_names[[model_n]], fixed = TRUE)) {
-      X <- append_time(X)  # append the time column to X, apply this only when considering time as covariate
+      # append the time column to X,
+      # apply this only when considering time as covariate
+      X <- append_time(X)
     }
     tic("start running")
     print("start running...")
@@ -120,15 +138,27 @@ for (feature in features) {
       "_",
       subject,
       ".RData"
-      )))
-    
+    )))
+
     # save jags output table
-    all_estimate_df <- bind_rows(all_estimate_df, get_jags_table(data.r2jags, subject, feature[[1]]))
+    all_estimate_df <- bind_rows(
+      all_estimate_df,
+      get_jags_table(data.r2jags, subject, feature[[1]])
+    )
   }
   # save estimated parameters table
   write.csv(
-  all_estimate_df, 
-  file = file.path(output_folder, paste0("all_estimates_", feature[[1]], "_", model_names[[model_n]], ".csv")), 
-  row.names=FALSE
+    all_estimate_df,
+    file = file.path(
+      output_folder,
+      paste0(
+        "all_estimates_",
+        feature[[1]],
+        "_",
+        model_names[[model_n]],
+        ".csv"
+      )
+    ),
+    row.names = FALSE
   )
 }

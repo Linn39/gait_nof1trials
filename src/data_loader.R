@@ -11,8 +11,13 @@ collect_all_data <- function(read_path, save_path, subs, runs) {
     for (run in runs) {
       for (foot in list(list("left_foot", "LF"), list("right_foot", "RF"))) {
         df <- readr::read_csv(
-          file.path(read_path, sub, run, paste0(foot[1], "_core_params_py_n.csv")),
-          col_names = T,
+          file.path(
+            read_path,
+            sub,
+            run,
+            paste0(foot[1], "_core_params_py_n.csv")
+          ),
+          col_names = TRUE,
           show_col_types = FALSE
         )
         df["sub"] <- sub
@@ -48,7 +53,7 @@ load_gait_parameters <- function(read_path, keyword) {
   if (keyword == "LFRF_all_strides") {
     dat_df <- readr::read_csv(
       file.path(read_path, file_name),
-      col_names = T,
+      col_names = TRUE,
       show_col_types = FALSE
     )
 
@@ -108,7 +113,7 @@ plot_over_time <- function(df, var) {
     # save the plot
     save_dir <- file.path("data", "figures", "dist_over_time")
     if (!dir.exists(save_dir)) {
-      dir.create(save_dir, recursive = T)
+      dir.create(save_dir, recursive = TRUE)
     }
     ggsave(
       file.path(save_dir, paste0("over_time_", var, "_", sub, ".pdf")),
@@ -167,15 +172,28 @@ downsample_rows <- function(df, step, plot = FALSE) {
             data = group_means, aes(xintercept = var.mean, colour = source),
             linetype = "dashed", size = 1
           ) +
-          labs(title = paste0("Distribution of Data ", sub), x = col, fill = "source")
+          labs(
+            title = paste0("Distribution of Data ", sub),
+            x = col,
+            fill = "source"
+          )
 
         # save the plot to a file
         save_dir <- file.path("data", "figures", "dist_downsample")
         if (!dir.exists(save_dir)) {
-          dir.create(save_dir, recursive = T)
+          dir.create(save_dir, recursive = TRUE)
         }
         ggsave(
-          file.path(save_dir, paste0("dist_downsample_", col, "_", sub, ".pdf")),
+          file.path(
+            save_dir,
+            paste0(
+              "dist_downsample_",
+              col,
+              "_",
+              sub,
+              ".pdf"
+            )
+          ),
           plot = dist_plot, width = 4, height = 3
         )
 

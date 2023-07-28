@@ -69,8 +69,20 @@ if (file.exists(
     all_estimate_df <- data.frame()
     for (variable in var_list) {
         for (sub in sub_list) {
-            data.r2jags <- get(load(file.path(read_path, paste0("data_r2jags_AR1_diff_prob_", variable[[2]], "_", sub, ".RData"))))
-            all_estimate_df <- bind_rows(all_estimate_df, get_jags_table(data.r2jags, sub, variable[[1]]))
+            data.r2jags <- get(load(file.path(
+                read_path,
+                paste0(
+                    "data_r2jags_AR1_diff_prob_",
+                    variable[[2]],
+                    "_",
+                    sub,
+                    ".RData"
+                )
+            )))
+            all_estimate_df <- bind_rows(
+                all_estimate_df,
+                get_jags_table(data.r2jags, sub, variable[[1]])
+            )
         }
     }
 
@@ -116,11 +128,19 @@ conditions_df_sd <- gather(conditions_df,
 plot_df <- merge(conditions_df_mean, conditions_df_sd)
 
 # add mean over all subjects
-conditions_df_mean_all <- aggregate(mean ~ condition + var, conditions_df_mean, mean)
+conditions_df_mean_all <- aggregate(
+    mean ~ condition + var,
+    conditions_df_mean,
+    mean
+)
 conditions_df_mean_all["sub"] <- "all"
 
 # add sd of means over all subjects
-conditions_df_sd_all <- aggregate(mean ~ condition + var, conditions_df_mean, sd) # SD of means
+conditions_df_sd_all <- aggregate(
+    mean ~ condition + var,
+    conditions_df_mean,
+    sd
+) # SD of means
 names(conditions_df_sd_all)[names(conditions_df_sd_all) == "mean"] <- "sd"
 conditions_df_sd_all["sub"] <- "all"
 
@@ -132,7 +152,14 @@ plot_df <- bind_rows(plot_df, conditions_df_all)
 # save estimated parameters table
 write.csv(
     plot_df,
-    file = file.path(read_path, paste0("all_estimates_gait_parameters_", model, ".csv")),
+    file = file.path(
+        read_path,
+        paste0(
+            "all_estimates_gait_parameters_",
+            model,
+            ".csv"
+        )
+    ),
     row.names = FALSE
 )
 
@@ -150,14 +177,21 @@ plot_df[plot_df == "all"] <- "All"
 
 #### Plot posterior estimates of the gait parameters
 fig_posterior <- ggplot(plot_df, aes(x = Participant, fill = Condition)) +
-    geom_boxplot(aes(ymin = mean - 3 * sd, lower = mean - sd, middle = mean, upper = mean + sd, ymax = mean + 3 * sd),
-        stat = "identity", width = 0.6, lwd = 0.3
+    geom_boxplot(aes(
+        ymin = mean - 3 * sd,
+        lower = mean - sd,
+        middle = mean,
+        upper = mean + sd,
+        ymax = mean + 3 * sd
+    ),
+    stat = "identity", width = 0.6, lwd = 0.3
     ) +
     ylab("Posterior Estimates") +
     scale_fill_brewer(palette = "Spectral") +
     theme_bw() +
     theme(axis.text.x = element_text(angle = 45, vjust = 0.6))
-fig_posterior2 <- fig_posterior + facet_wrap(vars(var), nrow = 2, strip.position = "left", scales = "free_y") +
+fig_posterior2 <- fig_posterior +
+    facet_wrap(vars(var), nrow = 2, strip.position = "left", scales = "free_y") +
     theme(
         strip.background = element_rect(fill = "white"),
         strip.placement = "outside",
@@ -248,7 +282,6 @@ for (var in list("Stride Length [m]", "Stride Time [s]")) {
         scale_fill_brewer(palette = "Spectral") +
         theme_bw() +
         theme(axis.text.x = element_text(angle = 45, vjust = 0.6))
-
     # boxplot for posterior estimates
     fig_posterior_var <- ggplot(plot_df[plot_df$var == var, ], aes(x = Participant, fill = Condition)) +
         geom_boxplot(aes(ymin = mean - 3 * sd, lower = mean - sd, middle = mean, upper = mean + sd, ymax = mean + 3 * sd),
@@ -262,7 +295,6 @@ for (var in list("Stride Length [m]", "Stride Time [s]")) {
             axis.text.x = element_text(angle = 45, vjust = 0.6),
             plot.margin = unit(c(0.5, 0.5, 2, 0.5), "lines")
         )
-
     # combine both plots
     fig_combined <- ggarrange(fig_posterior_var, fig_observation_var,
         labels = c("A", "B"),

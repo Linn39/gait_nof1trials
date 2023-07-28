@@ -27,11 +27,16 @@ options(width = 1000) # set the width of the console to display all columns
 print(data.r2jags$BUGSoutput$summary)
 
 # density plot
-den_plot <- denplot(data.r2jags, parms = c("beta", "sigma", "phi", "p_fatigue", "p_cognitive_task"))
+den_plot <- denplot(
+    data.r2jags,
+    parms = c("beta", "sigma", "phi", "p_fatigue", "p_cognitive_task")
+)
 
 # trace plot
-tra_plot <- traplot(as.mcmc(data.r2jags), parms = c("beta", "sigma", "phi", "p_fatigue", "p_cognitive_task"))
-
+tra_plot <- traplot(
+    as.mcmc(data.r2jags),
+    parms = c("beta", "sigma", "phi", "p_fatigue", "p_cognitive_task")
+)
 ```
 
 ```{r, fig.width = 7, fig.height = 7}
