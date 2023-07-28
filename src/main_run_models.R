@@ -31,7 +31,7 @@ model_names <- list(
   "time_cov_basic_informative", # 4
   "AR1",                        # 5
   "AR1_informative",            # 6
-  "AR1_model_diff_prob"         # 7
+  "AR1_diff_prob"               # 7
 )
 
 sub_list <- list(

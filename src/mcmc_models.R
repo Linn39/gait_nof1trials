@@ -220,7 +220,7 @@ sigma2 = pow(sigma,2)
 
 # write the model to a text file
 writeLines(AR1_model, con = file.path("models", "AR1.txt"))
-writeLines(AR1_model_diff_prob_SL, con = file.path("models", "AR1_model_diff_prob_SL.txt"))
-writeLines(AR1_model_diff_prob_ST, con = file.path("models", "AR1_model_diff_prob_ST.txt"))
+writeLines(AR1_model_diff_prob_SL, con = file.path("models", "AR1_diff_prob_SL.txt"))
+writeLines(AR1_model_diff_prob_ST, con = file.path("models", "AR1_diff_prob_ST.txt"))
 writeLines(AR1_model_informative_priors_SL, con = file.path("models", "AR1_informative_SL.txt"))
 writeLines(AR1_model_informative_priors_ST, con = file.path("models", "AR1_informative_ST.txt"))
