@@ -91,6 +91,35 @@ print_data_summary <- function(df, var) {
     print()
 }
 
+plot_over_time <- function(df, var) {
+  # plot the variable of interest by row index
+  for (sub in unique(df$sub)) {
+    sub_df <- df[df$sub == sub, ]
+    scatter_plot <- ggplot(
+      sub_df,
+      aes(
+        x = seq_len(nrow(sub_df)), y = sub_df[[var]],
+        color = fatigue, shape = condition
+      )
+    ) +
+      geom_point(size = 3) +
+      xlab("Sample Number") +
+      ylab(var)
+
+    # save the plot
+    save_dir <- file.path("data", "figures", "dist_over_time")
+    if (!dir.exists(save_dir)) {
+      dir.create(save_dir, recursive = T)
+    }
+    ggsave(
+      file.path(save_dir, paste0("over_time_", var, "_", sub, ".pdf")),
+      plot = scatter_plot,
+      width = 10,
+      height = 5
+    )
+  }
+}
+
 print_subject_summary <- function(df, var) {
   print(sprintf("Summary for %s:", var))
   # rename variable of interest

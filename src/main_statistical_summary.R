@@ -38,6 +38,8 @@ results_2_way_anova <- data.frame()
 
 for (var_name in features_list) {
   print_data_summary(df, var_name)
+  plot_over_time(df, var_name)
+
   colnames(df)[colnames(df) %in% c("height(cm)", "weight(kg)")] <- c("height_cm", "weight_kg") # rename columns
 
   dat_df <- select(df, "var" = var_name, "sub", "condition", "fatigue", "age", "sex", "height_cm", "weight_kg")
@@ -46,7 +48,7 @@ for (var_name in features_list) {
     data = dat_df,
     dv = .(var),
     wid = .(sub),
-    within = .(condition, fatigue),
+    within = .(condition, fatigue), 
     within_covariates = .(age, height_cm, weight_kg),
     detailed = T,
     type = 2
