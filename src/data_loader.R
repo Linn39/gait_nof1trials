@@ -1,8 +1,8 @@
 #### functions to load and process the data ####
 
-library(dplyr)
 library(ggplot2)
 library(plyr)
+library(dplyr)
 
 #### put data from all subjects and runs together, save as .csv
 collect_all_data <- function(read_path, save_path, subs, runs) {
