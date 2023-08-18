@@ -132,7 +132,7 @@ print_subject_summary <- function(df, var) {
     summarize(
       n = length(var),
       mean = mean(var),
-      sd = sd(var),
+    #   sd = sd(var),  # n - 1 as demoninator
       min = min(var),
       max = max(var),
       median = median(var)
@@ -140,6 +140,11 @@ print_subject_summary <- function(df, var) {
     as.data.frame(.) %>%
     mutate_if(is.numeric, round, 4) %>%
     print()
+
+    # print standard deviation separately (n as demoninator)
+    std <- sqrt(sum((df[["var"]] - mean(df[["var"]]))^2) / (nrow(sub_df)))
+    print(sprintf("Standard deviation for %s:", var))
+    print(std)
 }
 
 downsample_rows <- function(df, step, plot = FALSE) {
