@@ -105,7 +105,7 @@ for (feature in features) {
     dat_df <- filter(loc_df, sub == subject)
     dat_df <- dat_df[, c(feature[[1]], "fatigue", "condition")]
     print_data_summary(dat_df, feature[[1]])
-    dat_df <- rename(dat_df, c("y" = feature[[1]]))
+    dat_df <- dplyr::rename(dat_df, c("y" = feature[[1]]))
     print(paste("Current sample size:", nrow(dat_df)))
 
     # # viasualizing the data (optional)
