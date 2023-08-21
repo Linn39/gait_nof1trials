@@ -82,11 +82,14 @@ print_data_summary <- function(df, var) {
     mutate_if(is.numeric, round, 4) %>%
     print()
 
+### num. of strides per person, in each category, mean +- SD
+# if the "sub" column exists in df
+if ("sub" %in% colnames(df)) {
   # print number of stride per person
   print("Number of strides per person under each walking condition:")
-  count_per_sub_df <- df %>% dplyr::count(sub, fatigue, condition) # nolint
+  count_per_sub_df <- df %>% dplyr::count(sub, !!!syms(group_by_vars)) # nolint
   count_per_sub_df %>%
-    group_by(fatigue, condition) %>%
+    group_by(!!!syms(group_by_vars)) %>%
     summarize(
       mean = mean(n),
       sd = sd(n)
@@ -94,6 +97,7 @@ print_data_summary <- function(df, var) {
     as.data.frame(.) %>%
     mutate_if(is.numeric, round, 4) %>%
     print()
+  }
 }
 
 plot_over_time <- function(df, var) {
