@@ -57,7 +57,7 @@ for (var_name in features_list) {
     dv = .(var),
     wid = .(sub),
     within = .(condition, fatigue),
-    within_covariates = .(age, height_cm, weight_kg),
+    between_covariates = .(age, height_cm, weight_kg),
     detailed = TRUE,
     type = 2
   )
