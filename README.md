@@ -16,12 +16,15 @@ Retrieve and install packages required for this project:\
 Get statistical summary of the data:\
 run ```src/main_statistical_summary.R```
 
+Create a .txt file with the models to be used in the next step:\
+run ```src/mcmc_models.R```
+
 Sampling with JAGS to obtain the posterior estimates:\
 run ```src/main_run_models.R```\
 Alternatively, posteriors can be directly downloaded [here](../../wiki/Data) for subsequent analyses.
 
 Plot results:\
-run ```src/plot_results.Rmd```
+run ```src/main_plot_results.R```
 
 Quality control analyses:\
 run ```mcmc_diagnosis.Rmd```
