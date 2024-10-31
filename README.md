@@ -1,5 +1,5 @@
 ## About
-This is a repository for the publication Analyzing Population-Level Trials as N-of-1 Trials: an Application to Gait.
+This is a repository for the publication [Analyzing Population-Level Trials as N-of-1 Trials: an Application to Gait](https://doi.org/10.1016/j.conctc.2024.101282).
 
 ## Getting Started
 Clone the repository:\
